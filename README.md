@@ -17,15 +17,10 @@ Watch desktop for `ext` files and move them to `dir` (dir is relative to your ho
 shot-put <ext dir>
 ```
 
-Flag files (of type `ext`) that should never be moved:
-```console
-shot-put <ext dir> --preserve=file.png
-```
-
 ### Examples
 ```console
 shot-put .png /desktop/ideas/space
-shot-put .js /desktop/ideas/js --preserve=index.js
+shot-put .js /desktop/ideas/js
 ```
 
 ## License
