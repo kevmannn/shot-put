@@ -22,6 +22,12 @@ Flag files (of type `ext`) that should never be moved:
 shot-put <ext dir> --preserve=file.png
 ```
 
+### Examples
+```console
+shot-put .png /desktop/ideas/space
+shot-put .js /desktop/ideas/js --preserve=index.js
+```
+
 ## License
 
 MIT © [Kevin Donahue](https://twitter.com/recur_excur)
