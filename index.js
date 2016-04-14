@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const untildify = require('untildify');
+const pathExists = require('path-exists');
 
 let moved = [];
 
@@ -15,24 +16,23 @@ exports.watch = (ext, dir, opts) => {
   const desktop = userHome + `${path.sep}desktop`;
   const dest = path.join(userHome, dir);
 
-  fs.stat(dest, (err, stats) => {
-    if (err) return new Error(err);
-
-    if (!stats.isDirectory()) {
+  pathExists(dest).then(exists => {
+    if (!exists) {
       process.stderr.write(`${dir} is not a valid directory`);
-      process.exit(1);
-    } else {
-      process.stdout.write(`\nlistening to ${path.sep}desktop for new ${ext} files..\n`);
-      process.nextTick(moveExisting);
+      return process.exit(1);
+    }
 
-      // ..
+    process.stdout.write(`\nlistening to ${path.sep}desktop for new ${ext} files..\n`);
+    process.nextTick(() => {
+
+      moveExisting();
+      
       fs.watch(desktop, (e, file) => {
-
         if ((e === 'rename') && (path.extname(file) === ext)) {
           moveFile(file);
         }
       })
-    }
+    })
   })
 
   function moveFile(filename, oldPath, newPath) {

@@ -10,9 +10,6 @@ const cli = meow({
     'Usage:',
     '  $ shot-put <ext dir> Watch desktop for `ext` files and move them to `dir`',
     '',
-    'Options:',
-    '  --preserve=<files> File names (of type ext) to never move',
-    '',
     'Examples:',
     '  shot-put .png /desktop/ideas/space',
     '  shot-put .js /desktop/ideas/js --preserve=index.js'

@@ -4,6 +4,12 @@
 
 [![Build Status](https://travis-ci.org/kevmannn/shot-put.svg?branch=master)](https://travis-ci.org/kevmannn/shot-put)
 
+## Install
+
+```console
+npm install --global shot-put
+```
+
 ## Usage
 
 Watch desktop for `ext` files and move them to `dir` (dir is relative to your home dir):
