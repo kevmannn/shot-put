@@ -1,0 +1,40 @@
+{
+  "name": "shot-put",
+  "version": "0.0.1",
+  "description": "CLI tool to watch desktop for files of a given extension and automatically move them to a given directory",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "bin": "cli.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "keywords": [
+    "auto",
+    "automate",
+    "automatically",
+    "automation",
+    "cli",
+    "desktop",
+    "dir",
+    "directory",
+    "screencap",
+    "screenshot",
+    "transfer"
+  ],
+  "author": "Kevin Donahue <kevindonahuedevelopment@gmail.com> (https://twitter.com/recur_excur)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevmannn/shot-put"
+  },
+  "devDependencies": {
+    "ava": "^0.14.0"
+  },
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "meow": "^3.7.0",
+    "untildify": "^2.1.0"
+  }
+}
