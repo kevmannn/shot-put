@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
+// const isPathInside = require('is-path-inside');
 
 let moved = [];
 
@@ -14,13 +15,13 @@ exports.watch = (ext, dir, opts) => {
 
   const userHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
   const desktop = userHome + `${path.sep}desktop`;
-  const dest = path.join(userHome, dir);
+  const dest = path.resolve(dir.split(path.sep).slice(0, 3).join(path.sep)) === userHome ? dir : path.join(userHome, dir);
 
   pathExists(dest)
     .then(exists => {
       if (!exists) {
-        process.stderr.write(`${dest} is not a valid directory`);
-        return process.exit(1);
+        process.stderr.write(`${dir} is not a valid directory`);
+        return process.exit(0);
       }
 
       process.stdout.write(`\nlistening to ${path.sep}desktop for new ${ext} files..\n`);
