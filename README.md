@@ -20,7 +20,7 @@ shot-put <ext dir>
 ### Examples
 ```console
 shot-put .png /desktop/ideas/space
-shot-put .js /desktop/ideas/js
+shot-put .js /documents/scripts
 ```
 
 ## License

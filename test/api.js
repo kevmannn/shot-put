@@ -5,12 +5,21 @@ import tempWrite from 'temp-write';
 import execa from 'execa';
 import shotPut from '../';
 
-test.todo('.watch()');
+test('.watch() handles valid dest path', async t => {
+  const validPath = await tempWrite('const n = 42;\n', 't.js');
+  // ..
+})
 
-test.todo('.moved');
+test('.watch() moves existing files with ext suffix', async t => {
 
-test.todo('append file and remove old');
+})
 
-// test.todo('.revert()');
+test('.watch() moves detected file with ext suffix', async t => {
 
-// test.todo('set user default ext and dir');
+})
+
+test.todo('.moved reflects number of files moved');
+
+test.todo('.revert()');
+
+test.todo('set user default ext and dir');

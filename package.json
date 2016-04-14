@@ -16,9 +16,12 @@
     "automatically",
     "automation",
     "cli",
+    "cleanup",
     "desktop",
     "dir",
     "directory",
+    "fs",
+    "file-system",
     "screencap",
     "screenshot",
     "transfer"
