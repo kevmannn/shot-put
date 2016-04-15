@@ -12,22 +12,23 @@ const cli = meow({
     '',
     'Examples:',
     '  shot-put .png /desktop/ideas/space',
-    '  shot-put .js /desktop/ideas/js --preserve=index.js'
+    '  shot-put .js /documents/scripts'
   ]
 })
 
 const flags = cli.flags;
+const input = cli.input;
 
-if (cli.input.length < 2) {
-  process.stderr.write(`Invoked without ext and dir. Type 'shotPut --help' for examples\n`);
+if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
+  process.stderr.write(`Invoked with invalid ext and dir. Type 'shotPut --help' for examples\n`);
   process.exit(0);
 }
 
-shotPut.watch(cli.input[0], cli.input[1], flags);
+shotPut.watch(input[0], input[1], flags);
 
 process.on('SIGINT', () => {
 
-  process.stdout.write(chalk.cyan(`\nmoved ${shotPut.movedFiles.length} ${cli.input[0]} file${shotPut.movedFiles.length === 1 ? '' : 's'} to ${cli.input[1]}: \n`));
+  process.stdout.write(chalk.cyan(`\nmoved ${shotPut.movedFiles.length} ${input[0]} file${shotPut.movedFiles.length === 1 ? '' : 's'} to ${input[1]}: \n`));
   shotPut.movedFiles.forEach(file => console.log(chalk.magenta(file)));
 
   process.exit(0);
