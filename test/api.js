@@ -25,6 +25,7 @@ test.cb('.watch() listens when given valid dest path', t => {
   const sp = child_process.spawn('../cli.js', [ext, dest]);
 
   sp.stdout.on('data', (data) => {
+    sp.kill();
     t.is(data.toString(), `watching ${path.sep}desktop for new ${ext} files..\n`)
     t.end();
   })
