@@ -16,6 +16,8 @@ exports.watch = (ext, dir, opts) => {
   const desktop = userHome + `${path.sep}desktop`;
   const dest = path.resolve(dir.split(path.sep).slice(0, 3).join(path.sep)) === userHome ? dir : path.join(userHome, dir);
 
+  if (dest === desktop) return process.stderr.write('dir must be a directory other than /desktop\n');
+
   pathExists(dest)
     .then(exists => {
       if (!exists) {
@@ -23,7 +25,7 @@ exports.watch = (ext, dir, opts) => {
         process.exit(0);
       }
 
-      process.stdout.write(`\nwatching ${path.sep}desktop for new ${ext} files..\n`);
+      process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
       process.nextTick(() => {
 
         // ..

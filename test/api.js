@@ -1,37 +1,32 @@
 import fs from 'fs';
 import path from 'path';
+import child_process from 'child_process';
 import test from 'ava';
-import tempWrite from 'temp-write';
+// import execa from 'execa';
+// import tempWrite from 'temp-write';
 import uniqueTempDir from 'unique-temp-dir';
-import execa from 'execa';
 import shotPut from '../';
 
-test('.watch() handles valid dest path', async t => {
-  const dest = '/documents';
-  execa('../cli.js', ['.js', dest])
-    .then(result => {
-
-      t.is(result.stdout, '\nwatching ${path.sep}desktop for new .js files..\n');
-    })
-    .catch(err => console.error(err))
+test.cb('.watch() rejects desktop dest path', t => {
+  t.plan(2);
+  const dest = '/desktop';
+  child_process.execFile('../cli.js', ['.js', dest], (err, stdout, stderr) => {
+    t.ifError(err);
+    t.is(stderr, 'dir must be a directory other than /desktop\n');
+    t.end();
+  })
 })
 
-test('.watch() handles invalid dest path', async t => {
-  const dest = await uniqueTempDir();
-  execa('../cli.js', ['.js', dest])
-    .then(result => {
-
-      t.is(result.stderr, `${dest} is not a valid directory`);
-    })
-    .catch(err => console.error(err))
-})
-
-test('.watch() detects file with ext suffix', async t => {
-  // ..
+test.cb('.watch() rejects non-existing dest path', t => {
+  t.plan(2);
+  const dest = uniqueTempDir();
+  child_process.execFile('../cli.js', ['.js', dest], (err, stdout, stderr) => {
+    t.ifError(err);
+    t.is(stderr, `${dest} is not a valid directory\n`);
+    t.end();
+  })
 })
 
 test.todo('.moved reflects number of files moved');
 
 test.todo('.revert() restores moved files to desktop');
-
-test.todo('set user default ext and dir');
