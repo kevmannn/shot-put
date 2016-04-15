@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
-// const isPathInside = require('is-path-inside');
 
 let moved = [];
 
@@ -20,19 +19,21 @@ exports.watch = (ext, dir, opts) => {
   pathExists(dest)
     .then(exists => {
       if (!exists) {
-        process.stderr.write(`${dir} is not a valid directory`);
-        return process.exit(0);
+        process.stderr.write(`${dir} is not a valid directory\n`);
+        process.exit(0);
       }
 
-      process.stdout.write(`\nlistening to ${path.sep}desktop for new ${ext} files..\n`);
+      process.stdout.write(`\nwatching ${path.sep}desktop for new ${ext} files..\n`);
       process.nextTick(() => {
 
-        moveExisting();
+        // ..
+        moveExisting(() => {
 
-        fs.watch(desktop, (e, file) => {
-          if ((e === 'rename') && (path.extname(file) === ext)) {
-            moveFile(file);
-          }
+          fs.watch(desktop, (e, file) => {
+            if ((e === 'rename') && (path.extname(file) === ext)) {
+              moveFile(file);
+            }
+          })
         })
       })
     })
@@ -49,19 +50,22 @@ exports.watch = (ext, dir, opts) => {
       fs.appendFile(newPath, fileData, (err) => {
         if (err) return new Error(err);
 
+        process.stdout.write(`..moving ${filename}\n`);
         moved.push(filename);
         fs.unlink(oldPath, (err) => {})
       })
     })
   }
 
-  function moveExisting() {
+  function moveExisting(cb) {
     fs.readdir(desktop, (err, files) => {
       if (err) return new Error(err);
 
       files
         .filter(file => path.extname(file) === ext)
         .forEach(f => moveFile(f))
+
+      cb();
     })
   }
 }

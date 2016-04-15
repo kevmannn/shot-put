@@ -6,23 +6,32 @@ import uniqueTempDir from 'unique-temp-dir';
 import execa from 'execa';
 import shotPut from '../';
 
+test('.watch() handles valid dest path', async t => {
+  const dest = '/documents';
+  execa('../cli.js', ['.js', dest])
+    .then(result => {
+
+      t.is(result.stdout, '\nwatching ${path.sep}desktop for new .js files..\n');
+    })
+    .catch(err => console.error(err))
+})
+
 test('.watch() handles invalid dest path', async t => {
-  const dir = await uniqueTempDir();
-  shotPut.watch('.js', dir);
-  // t.is(shotPut.watch('.js', p), '');
+  const dest = await uniqueTempDir();
+  execa('../cli.js', ['.js', dest])
+    .then(result => {
+
+      t.is(result.stderr, `${dest} is not a valid directory`);
+    })
+    .catch(err => console.error(err))
 })
 
-test('.watch() moves existing files with ext suffix', async t => {
-  const p = await tempWrite('const n = 42;\n', 'n.js');
-
-})
-
-test('.watch() moves detected file with ext suffix', async t => {
-
+test('.watch() detects file with ext suffix', async t => {
+  // ..
 })
 
 test.todo('.moved reflects number of files moved');
 
-test.todo('.revert()');
+test.todo('.revert() restores moved files to desktop');
 
 test.todo('set user default ext and dir');
