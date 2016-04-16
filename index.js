@@ -17,6 +17,7 @@ exports.watch = (ext, dir, opts) => {
   const dest = path.resolve(dir.split(path.sep).slice(0, 3).join(path.sep)) === userHome ? dir : path.join(userHome, dir);
 
   if (dest === desktop) return process.stderr.write('dir must be a directory other than /desktop\n');
+  if (ext.charAt(0) !== '.') ext = '.' + ext;
 
   pathExists(dest)
     .then(exists => {
@@ -77,7 +78,6 @@ exports.movedFiles = moved;
 exports.revert = () => {
   if (!moved.length) return null;
 
-  // ..
   moved.forEach(file => {
     const postMove = path.normalize(dest + `${path.sep + file.replace(/\s/g, '_')}`);
     const preMove = path.normalize(desktop + `${path.sep + file}`);

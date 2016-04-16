@@ -16,8 +16,8 @@ const cli = meow({
   ]
 })
 
-const flags = cli.flags;
 const input = cli.input;
+const flags = cli.flags;
 
 if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.stderr.write(`Invoked with invalid ext and dir. Type 'shotPut --help' for examples\n`);

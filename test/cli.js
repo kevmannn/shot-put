@@ -1,9 +1,16 @@
 import fs from 'fs';
 import path from 'path';
+import child_process from 'child_process';
 import test from 'ava';
-import tempWrite from 'temp-write';
 import execa from 'execa';
 
-test.todo('preserve flag protects files from movement');
+const ext = '.js';
+const dest = `${path.sep}documents`;
 
-test.todo('default flag stores ext and dir values');
+test.skip('--preserve protects files from movement', t => {
+  const sp = child_process.spawn('../cli.js', [ext, dest, `--preserve="${n.js}"`]);
+})
+
+test.todo('--default stores ext and dir values');
+
+test.todo('rejects non-string input args');

@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 import test from 'ava';
-// import execa from 'execa';
 // import tempWrite from 'temp-write';
+// import pathExists from 'path-exists';
 import uniqueTempDir from 'unique-temp-dir';
 import shotPut from '../';
 
@@ -20,16 +20,10 @@ test.cb('.watch() rejects non-existing dest path', t => {
   })
 })
 
-test.skip('.watch() listens when given valid dest path', t => {
+test.cb('.watch() listens when given valid dest path', t => {
   t.plan(1);
-  // const dest = `${path.sep}documents`;
-  const dest = uniqueTempDir();
-  const sp = child_process.spawn('../cli.js', [ext, dest]);
-
-  sp.stderr.on('data', data => {
-    console.log(data.toString());
-    t.end();
-  })
+  const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+  const sp = child_process.spawn('../cli.js', [ext, home]);
 
   sp.stdout.on('data', data => {
     t.is(data.toString(), `watching ${path.sep}desktop for new ${ext} files..\n`)
@@ -37,6 +31,8 @@ test.skip('.watch() listens when given valid dest path', t => {
   })
 })
 
-test.todo('.moved reflects number of files moved');
+test.skip('.moved reflects number of files moved', t => {
+  t.plan(2);
+})
 
 test.todo('.revert() restores moved files to desktop');
