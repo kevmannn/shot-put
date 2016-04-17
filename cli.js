@@ -10,9 +10,13 @@ const cli = meow({
     'Usage:',
     '  $ shot-put <ext dir> Watch desktop for `ext` files and move them to `dir`',
     '',
+    'Options:',
+    '  --preserve="<filenames>" Prevent specific files from ever being moved',
+    '',
     'Examples:',
     '  shot-put .png /desktop/ideas/space',
-    '  shot-put .js /documents/scripts'
+    '  shot-put .js /documents/scripts',
+    '  shot-put .py /documents/scripts --preserve="i.py j.py"'
   ]
 })
 
@@ -21,7 +25,7 @@ const flags = cli.flags;
 
 if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.stderr.write(`Invoked with invalid ext and dir. Type 'shotPut --help' for examples\n`);
-  process.exit(0);
+  process.exit(1);
 }
 
 shotPut.watch(input[0], input[1], flags);

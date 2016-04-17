@@ -10,7 +10,7 @@ exports.watch = (ext, dir, opts) => {
 
   dir = untildify(dir);
   opts = opts || {};
-  const preserve = opts.preserve || [];
+  const preserve = typeof opts.preserve !== 'undefined' ? opts.preserve.split(/\s/g) : [];
 
   const userHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
   const desktop = userHome + `${path.sep}desktop`;
@@ -29,7 +29,6 @@ exports.watch = (ext, dir, opts) => {
       process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
       process.nextTick(() => {
 
-        // ..
         moveExisting(() => {
 
           fs.watch(desktop, (e, file) => {

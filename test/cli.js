@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 import test from 'ava';
-// import execa from 'execa';
 
 const ext = '.js';
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
@@ -17,7 +16,7 @@ test.cb('cli rejects non-string input args', t => {
 })
 
 test.skip('--preserve protects files from movement', t => {
-  const sp = child_process.spawn('../cli.js', [ext, home, '--preserve="n.js"']);
+  const sp = child_process.spawn('../cli.js', [ext, home, '--preserve="n.js m.js"']);
 })
 
 test.todo('--default stores ext and dir values');
