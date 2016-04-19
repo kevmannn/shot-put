@@ -4,12 +4,12 @@ const path = require('path');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
 
-let moved = [];
-
 exports.watch = (ext, dir, opts) => {
 
   dir = untildify(dir);
   opts = opts || {};
+
+  let moved = [];
   let preserved = [];
 
   if (typeof opts.preserve !== 'undefined') {
@@ -82,13 +82,4 @@ exports.watch = (ext, dir, opts) => {
   }
 }
 
-exports.revert = () => {
-  if (!moved.length) return null;
-
-  moved.forEach(file => {
-    const postMove = path.normalize(dest + `${path.sep + file.replace(/\s/g, '_')}`);
-    const preMove = path.normalize(desktop + `${path.sep + file}`);
-
-    return moveFile(file, postMove, preMove);
-  })
-}
+exports.revert = () => {}
