@@ -29,20 +29,15 @@ test.cb('.watch() listens when given valid dest path', t => {
   })
 })
 
-test.skip('info.moved reflects number of files moved', t => {
+test.cb('info.moved reflects number of files moved', t => {
   const env = Object.create(process.env);
   env.FORK = true;
 
   const sp = child_process.fork('../cli.js', [ext, home], { env });
-  // console.log(sp);
-
-  sp.kill('SIGINT');
 
   sp.on('message', m => {
-    if (Array.isArray(m.movedFiles)) {
-      t.is(m.movedFiles.length, 0);
-      t.end();
-    }
+    t.is(m.movedFiles.length, 0);
+    t.end();
   })
 })
 

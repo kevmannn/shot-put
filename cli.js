@@ -28,6 +28,14 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.exit(1);
 }
 
+if (process.env.FORK) {
+
+  // TODO: ..
+  setTimeout(() => {
+    process.kill(process.pid, 'SIGINT');
+  }, 0)
+}
+
 return shotPut.watch(input[0], input[1], flags)
   .then(info => {
 

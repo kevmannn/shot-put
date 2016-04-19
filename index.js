@@ -10,7 +10,11 @@ exports.watch = (ext, dir, opts) => {
 
   dir = untildify(dir);
   opts = opts || {};
-  const preserved = typeof opts.preserve !== 'undefined' ? opts.preserve.split(/\s/g) : [];
+  let preserved = [];
+
+  if (typeof opts.preserve !== 'undefined') {
+    preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
+  }
 
   const userHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
   const desktop = userHome + `${path.sep}desktop`;

@@ -15,9 +15,16 @@ test.cb('cli rejects non-string input args', t => {
   })
 })
 
-test.skip('--preserve protects files from movement', t => {
-  const sp = child_process.fork('../cli.js', [ext, home, '--preserve="i.js j.js"']);
-  // ..
+test.cb('--preserve protects files from movement', t => {
+  const env = Object.create(process.env);
+  env.FORK = true;
+
+  const sp = child_process.fork('../cli.js', [ext, home, '--preserve="i.js j.js"'], { env });
+
+  sp.on('message', m => {
+    t.deepEqual(m.preservedFiles, ['i.js', 'j.js']);
+    t.end();
+  })
 })
 
 test.todo('--default stores ext and dir values');
