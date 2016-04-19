@@ -4,12 +4,12 @@ import child_process from 'child_process';
 import test from 'ava';
 import tempWrite from 'temp-write';
 import uniqueTempDir from 'unique-temp-dir';
-import shotPut from '../';
+// import shotPut from '../';
 
 const ext = '.js';
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 
-test.skip('.watch() rejects non-existing dest path', t => {
+test.cb('.watch() rejects non-existing dest path', t => {
   const dest = path.join(uniqueTempDir(), `${path.sep}x`);
   t.plan(2);
 
@@ -30,16 +30,16 @@ test.cb('.watch() listens when given valid dest path', t => {
   })
 })
 
-test.cb('.moved reflects number of files moved', t => {
-  const sp = child_process.spawn('../cli.js', [ext, home]);
-  t.plan(2);
+// test.skip('.moved reflects number of files moved', t => {
+//   const sp = child_process.spawn('../cli.js', [ext, home]);
+//   t.plan(2);
 
-  sp.stdout.on('data', data => {
-    t.deepEqual(shotPut.movedFiles, []);
-    t.is(shotPut.movedFiles.length, 0);
-    t.end();
-  })
-})
+//   sp.stdout.on('data', data => {
+//     t.deepEqual(shotPut.movedFiles, []);
+//     t.is(shotPut.movedFiles.length, 0);
+//     t.end();
+//   })
+// })
 
 test.todo('.watch() adds file to dest');
 

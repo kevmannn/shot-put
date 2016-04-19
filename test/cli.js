@@ -15,8 +15,10 @@ test.cb('cli rejects non-string input args', t => {
   })
 })
 
-test.skip('--preserve protects files from movement', t => {
-  const sp = child_process.spawn('../cli.js', [ext, home, '--preserve="n.js m.js"']);
+test.skip('--preserve protects files from movement', async t => {
+  const sp = await child_process.execFile('../cli.js', [ext, home, '--preserve="n.js m.js"']);
+  sp.kill('SIGINT');
+  // t.deepEqual(sp.preserved, ['n.js', 'm.js']);
 })
 
 test.todo('--default stores ext and dir values');

@@ -10,7 +10,7 @@ exports.watch = (ext, dir, opts) => {
 
   dir = untildify(dir);
   opts = opts || {};
-  const preserve = typeof opts.preserve !== 'undefined' ? opts.preserve.split(/\s/g) : [];
+  const preserved = typeof opts.preserve !== 'undefined' ? opts.preserve.split(/\s/g) : [];
 
   const userHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
   const desktop = userHome + `${path.sep}desktop`;
@@ -21,16 +21,17 @@ exports.watch = (ext, dir, opts) => {
 
   pathExists(dest)
     .then(exists => {
+
       if (!exists) {
         process.stderr.write(`${dir} is not a valid directory\n`);
         process.exit(0);
       }
 
       process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
+
       process.nextTick(() => {
 
         moveExisting(() => {
-
           fs.watch(desktop, (e, file) => {
             if ((e === 'rename') && (path.extname(file) === ext)) {
               moveFile(file);
@@ -40,8 +41,13 @@ exports.watch = (ext, dir, opts) => {
       })
     })
 
+  return new Promise((resolve, reject) => {
+
+    process.on('SIGINT', () => resolve({ moved, preserved }));
+  })
+
   function moveFile(filename, oldPath, newPath) {
-    if (preserve.indexOf(filename) > -1) return null;
+    if (preserved.indexOf(filename) > -1) return null;
 
     oldPath = oldPath || path.normalize(desktop + `${path.sep + filename}`);
     newPath = newPath || path.normalize(dest + `${path.sep + filename.replace(/\s/g, '_')}`);
@@ -71,8 +77,6 @@ exports.watch = (ext, dir, opts) => {
     })
   }
 }
-
-exports.movedFiles = moved;
 
 exports.revert = () => {
   if (!moved.length) return null;

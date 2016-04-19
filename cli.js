@@ -28,12 +28,11 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.exit(1);
 }
 
-shotPut.watch(input[0], input[1], flags);
+return shotPut.watch(input[0], input[1], flags)
+  .then(info => {
 
-process.on('SIGINT', () => {
+    process.stdout.write(chalk.cyan(`\nmoved ${info.moved.length} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${input[1]}: \n`));
+    info.moved.forEach(file => console.log(chalk.magenta(file)));
 
-  process.stdout.write(chalk.cyan(`\nmoved ${shotPut.movedFiles.length} ${input[0]} file${shotPut.movedFiles.length === 1 ? '' : 's'} to ${input[1]}: \n`));
-  shotPut.movedFiles.forEach(file => console.log(chalk.magenta(file)));
-
-  process.exit(0);
-})
+    process.exit(0);
+  })
