@@ -4,7 +4,6 @@ import child_process from 'child_process';
 import test from 'ava';
 import tempWrite from 'temp-write';
 import uniqueTempDir from 'unique-temp-dir';
-// import shotPut from '../';
 
 const ext = '.js';
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
@@ -30,16 +29,22 @@ test.cb('.watch() listens when given valid dest path', t => {
   })
 })
 
-// test.skip('.moved reflects number of files moved', t => {
-//   const sp = child_process.spawn('../cli.js', [ext, home]);
-//   t.plan(2);
+test.skip('info.moved reflects number of files moved', t => {
+  const sp = child_process.fork('../cli.js', [ext, home], { env: { FORK: true } });
+  t.plan(1);
 
-//   sp.stdout.on('data', data => {
-//     t.deepEqual(shotPut.movedFiles, []);
-//     t.is(shotPut.movedFiles.length, 0);
-//     t.end();
-//   })
-// })
+  sp.stdout.on('data', data => {
+    sp.kill('SIGINT');
+  })
+
+  sp.on('message', m => {
+    console.log(m);
+    if (m.movedFiles) {
+      // t.is(m.movedFiles.length, 0);
+      t.end();
+    }
+  })
+})
 
 test.todo('.watch() adds file to dest');
 

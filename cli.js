@@ -34,5 +34,10 @@ return shotPut.watch(input[0], input[1], flags)
     process.stdout.write(chalk.cyan(`\nmoved ${info.moved.length} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${input[1]}: \n`));
     info.moved.forEach(file => console.log(chalk.magenta(file)));
 
+    if (process.env.FORK) {
+
+      process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
+    }
+
     process.exit(0);
   })
