@@ -12,7 +12,7 @@ npm install --global shot-put
 
 ## Usage
 
-Watch desktop for `ext` files and move them to `dir` (`dir` is relative to your user home):
+Watch `/desktop` for `ext` files and move them to `dir` (`dir` is relative to your user home):
 ```console
 shot-put <ext dir>
 ```

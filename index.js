@@ -35,7 +35,9 @@ exports.watch = (ext, dir, opts) => {
 
       process.nextTick(() => {
 
-        moveExisting(() => {
+        moveExisting((err) => {
+          if (err) return new Error(err);
+
           fs.watch(desktop, (e, file) => {
             if ((e === 'rename') && (path.extname(file) === ext)) {
               moveFile(file);
@@ -71,13 +73,13 @@ exports.watch = (ext, dir, opts) => {
 
   function moveExisting(cb) {
     fs.readdir(desktop, (err, files) => {
-      if (err) return new Error(err);
+      if (err) return cb(err);
 
       files
         .filter(file => path.extname(file) === ext)
         .forEach(f => moveFile(f))
 
-      cb();
+      cb(null);
     })
   }
 }
