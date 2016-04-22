@@ -4,7 +4,7 @@ const path = require('path');
 const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
-// const log = require('single-line-log').stdout;
+const log = require('single-line-log').stdout;
 
 exports.watch = (ext, dir, opts) => {
 
@@ -37,14 +37,14 @@ exports.watch = (ext, dir, opts) => {
 
       process.nextTick(() => {
 
-        moveExisting((err) => {
-          if (err) return new Error(err);
-
-          fs.watch(desktop, (e, file) => {
-            if ((e === 'rename') && (path.extname(file) === ext)) {
-              moveFile(file);
-            }
-          })
+        async.series([
+          moveExisting,
+          watch
+        ], err => {
+          if (err) {
+            log.clear();
+            return new Error('..encountered a problem watching the desktop');
+          }
         })
       })
     })
@@ -96,6 +96,12 @@ exports.watch = (ext, dir, opts) => {
         .forEach(f => moveFile(f))
 
       cb(null);
+    })
+  }
+
+  function watch() {
+    fs.watch(desktop, (e, source) => {
+      if (e === 'rename' && path.extname(source) === ext) moveFile(source);
     })
   }
 }
