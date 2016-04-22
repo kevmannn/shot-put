@@ -66,10 +66,9 @@ exports.watch = (ext, dir, opts) => {
     ], err => {
       if (err) return new Error(err);
 
-      process.stdout.write(`..moving ${filename}\n`);
       moved.push(filename);
-
-      fs.unlink(oldPath, (err) => {})      
+      log(`..moved ${filename}\n`);
+      fs.unlink(oldPath, err => {});
     })
 
     function read(cb) {
@@ -81,7 +80,7 @@ exports.watch = (ext, dir, opts) => {
 
     function append(fileData, cb) {
       fs.appendFile(newPath, fileData, (err) => {
-        if (err) return cb(err);
+        if (err) return cb(err);        
         cb(null);
       })
     }

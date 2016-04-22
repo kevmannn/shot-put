@@ -37,8 +37,11 @@ if (process.env.FORK) {
 return shotPut.watch(input[0], input[1], flags)
   .then(info => {
 
-    process.stdout.write(chalk.cyan(`\nmoved ${info.moved.length} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${input[1]}: \n`));
-    info.moved.forEach(file => console.log(chalk.magenta(file)));
+    const q = chalk.cyan(chalk.bold(`${info.moved.length}`));
+    const d = chalk.green(chalk.bold(`${input[1]}`));
+
+    process.stdout.write(`\nmoved ${q} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${d}: \n`);
+    info.moved.forEach(file => console.log(chalk.italic(file)));
 
     if (process.env.FORK) {
 
