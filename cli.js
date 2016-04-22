@@ -5,20 +5,18 @@ const meow = require('meow');
 const chalk = require('chalk');
 const shotPut = require('./');
 
-const cli = meow({
-  help: [
-    'Usage:',
-    '  $ shot-put <ext dir> Watch desktop for `ext` files and move them to `dir`',
-    '',
-    'Options:',
-    '  --preserve="<filenames>" Prevent specific files from ever being moved',
-    '',
-    'Examples:',
-    '  shot-put .png /desktop/ideas/space',
-    '  shot-put .js /documents/scripts',
-    '  shot-put .py /documents/scripts --preserve="i.py j.py"'
-  ]
-})
+const cli = meow(`
+  Usage:
+    $ shot-put <ext dir> Watch desktop for 'ext' files and move them to 'dir'
+
+  Options:
+    --preserve="<filenames>" Prevent specific files from ever being moved
+
+  Examples:
+    $ shot-put .png /desktop/ideas/space
+    $ shot-put .js /documents/scripts
+    $ shot-put .py /documents/scripts --preserve="i.py j.py"
+`)
 
 const input = cli.input;
 const flags = cli.flags;
