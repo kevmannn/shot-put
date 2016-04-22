@@ -63,7 +63,7 @@ exports.watch = (ext, dir, opts) => {
     async.waterfall([
       read,
       append
-    ], (err, result) => {
+    ], err => {
       if (err) return new Error(err);
 
       process.stdout.write(`..moving ${filename}\n`);
