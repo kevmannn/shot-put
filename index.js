@@ -1,8 +1,10 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
+// const log = require('single-line-log').stdout;
 
 exports.watch = (ext, dir, opts) => {
 
@@ -58,17 +60,31 @@ exports.watch = (ext, dir, opts) => {
     oldPath = oldPath || path.normalize(desktop + `${path.sep + filename}`);
     newPath = newPath || path.normalize(dest + `${path.sep + filename.replace(/\s/g, '_')}`);
 
-    fs.readFile(oldPath, (err, fileData) => {
+    async.waterfall([
+      read,
+      append
+    ], (err, result) => {
       if (err) return new Error(err);
 
-      fs.appendFile(newPath, fileData, (err) => {
-        if (err) return new Error(err);
+      process.stdout.write(`..moving ${filename}\n`);
+      moved.push(filename);
 
-        process.stdout.write(`..moving ${filename}\n`);
-        moved.push(filename);
-        fs.unlink(oldPath, (err) => {})
-      })
+      fs.unlink(oldPath, (err) => {})      
     })
+
+    function read(cb) {
+      fs.readFile(oldPath, (err, fileData) => {
+        if (err) return cb(err);
+        cb(null, fileData);
+      })
+    }
+
+    function append(fileData, cb) {
+      fs.appendFile(newPath, fileData, (err) => {
+        if (err) return cb(err);
+        cb(null);
+      })
+    }
   }
 
   function moveExisting(cb) {
