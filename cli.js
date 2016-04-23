@@ -41,7 +41,7 @@ return shotPut.watch(input[0], input[1], flags)
     const d = chalk.green(chalk.bold(`${input[1]}`));
 
     process.stdout.write(`\nmoved ${q} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${d}: \n`);
-    info.moved.forEach(file => console.log(chalk.italic(file)));
+    info.moved.forEach(file => console.log('  ' + chalk.italic(file)));
 
     if (process.env.FORK) {
 
