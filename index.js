@@ -18,9 +18,9 @@ exports.watch = (ext, dir, opts) => {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
   }
 
-  const userHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-  const desktop = userHome + `${path.sep}desktop`;
-  const dest = path.resolve(dir.split(path.sep).slice(0, 3).join(path.sep)) === userHome ? dir : path.join(userHome, dir);
+  const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+  const dest = dir.split(path.sep).slice(0, 3).join(path.sep) === home ? dir : path.join(home, dir);
+  const desktop = home + `${path.sep}desktop`;
 
   if (dest === desktop) return process.stderr.write('dir must be a directory other than /desktop\n');
   if (ext.charAt(0) !== '.') ext = '.' + ext;
