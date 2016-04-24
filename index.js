@@ -6,6 +6,8 @@ const untildify = require('untildify');
 const pathExists = require('path-exists');
 const log = require('single-line-log').stdout;
 
+exports.revert = () => {}
+
 exports.watch = (ext, dir, opts) => {
 
   dir = untildify(dir);
@@ -104,5 +106,3 @@ exports.watch = (ext, dir, opts) => {
     })
   }
 }
-
-exports.revert = () => {}
