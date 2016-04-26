@@ -16,7 +16,9 @@ const cli = meow(`
     $ shot-put .png /desktop/ideas/space
     $ shot-put .js /documents/scripts
     $ shot-put .py /documents/scripts --preserve="i.py j.py"
-`)
+`, {
+  alias: { p: 'preserve' }
+})
 
 const input = cli.input;
 const flags = cli.flags;
