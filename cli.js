@@ -28,9 +28,8 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.exit(1);
 }
 
+// TODO: ..
 if (process.env.FORK) {
-
-  // TODO: ..
   setTimeout(() => {
     process.kill(process.pid, 'SIGINT');
   }, 0)
@@ -38,7 +37,6 @@ if (process.env.FORK) {
 
 return shotPut.watch(input[0], input[1], flags)
   .then(info => {
-
     const q = chalk.cyan(chalk.bold(`${info.moved.length}`));
     const d = chalk.green(chalk.bold(`${input[1]}`));
 
@@ -46,9 +44,11 @@ return shotPut.watch(input[0], input[1], flags)
     info.moved.forEach(file => console.log('  ' + chalk.italic(file)));
 
     if (process.env.FORK) {
-
       process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
     }
 
     process.exit(0);
+  })
+  .catch(err => {
+    process.stderr.write(chalk.red(err));
   })

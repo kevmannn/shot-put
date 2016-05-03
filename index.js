@@ -13,6 +13,10 @@ exports.revert = () => {}
 
 exports.watch = (ext, dir, opts) => {
 
+  if (![ext, dir].every(arg => typeof arg === 'string')) {
+    return new TypeError(`expected strings as first two arguments`);
+  }
+
   dir = untildify(dir);
   opts = opts || {};
 
@@ -24,30 +28,29 @@ exports.watch = (ext, dir, opts) => {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
   }
 
-  if (dest === desktop) return process.stderr.write('dir must be a directory other than /desktop\n');
   if (ext.charAt(0) !== '.') ext = '.' + ext;
 
-  pathExists(dest)
-    .then(exists => {
-      if (!exists) {
-        process.stderr.write(`${dir} is not a valid directory\n`);
-        process.exit(0);
-      }
-
-      process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
-
-      async.series([
-        moveExisting,
-        watch
-      ], err => {
-        if (err) {
-          log.clear();
-          return new Error('..encountered a problem watching the desktop');
-        }
-      })
-    })
-
   return new Promise((resolve, reject) => {
+
+    pathExists(dest)
+      .then(exists => {
+
+        if (!exists) return reject(`${dir} is not a valid directory\n`);
+        if (dest === desktop) return reject(`must target a directory other than ${path.sep + desktop}\n`);
+
+        process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
+
+        async.series([
+          moveExisting,
+          watch
+        ], err => {
+          if (err) {
+            log.clear();
+            return reject('..encountered a problem watching the desktop');
+          }
+        })
+      })
+
     process.on('SIGINT', () => resolve({ moved, preserved }));
   })
 
