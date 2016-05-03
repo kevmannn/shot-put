@@ -2,14 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 import test from 'ava';
-import tempWrite from 'temp-write';
-import uniqueTempDir from 'unique-temp-dir';
+// import tempWrite from 'temp-write';
+// import uniqueTempDir from 'unique-temp-dir';
 
 const ext = '.js';
-const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 
 test.cb('.watch() rejects non-existing dest path', t => {
-  const dest = path.join(uniqueTempDir(), `${path.sep}x`);
+  const dest = path.join(__dirname, `${path.sep}x`);
   t.plan(2);
 
   child_process.execFile('../cli.js', [ext, dest], (err, stdout, stderr) => {
@@ -20,7 +19,7 @@ test.cb('.watch() rejects non-existing dest path', t => {
 })
 
 test.cb('.watch() listens when given valid dest path', t => {
-  const sp = child_process.spawn('../cli.js', [ext, home]);
+  const sp = child_process.spawn('../cli.js', [ext, __dirname]);
   t.plan(1);
 
   sp.stdout.on('data', data => {
@@ -33,7 +32,7 @@ test.cb('info.moved reflects number of files moved', t => {
   const env = Object.create(process.env);
   env.FORK = true;
 
-  const sp = child_process.fork('../cli.js', [ext, home], { env });
+  const sp = child_process.fork('../cli.js', [ext, __dirname], { env });
 
   sp.on('message', m => {
     t.is(m.movedFiles.length, 0);

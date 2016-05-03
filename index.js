@@ -6,6 +6,9 @@ const untildify = require('untildify');
 const pathExists = require('path-exists');
 const log = require('single-line-log').stdout;
 
+const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+const desktop = home + `${path.sep}desktop`;
+
 exports.revert = () => {}
 
 exports.watch = (ext, dir, opts) => {
@@ -15,21 +18,17 @@ exports.watch = (ext, dir, opts) => {
 
   let moved = [];
   let preserved = [];
+  const dest = dir.split(path.sep).slice(0, 3).join(path.sep) === home ? dir : path.join(home, dir);
 
   if (typeof opts.preserve !== 'undefined') {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
   }
-
-  const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-  const dest = dir.split(path.sep).slice(0, 3).join(path.sep) === home ? dir : path.join(home, dir);
-  const desktop = home + `${path.sep}desktop`;
 
   if (dest === desktop) return process.stderr.write('dir must be a directory other than /desktop\n');
   if (ext.charAt(0) !== '.') ext = '.' + ext;
 
   pathExists(dest)
     .then(exists => {
-
       if (!exists) {
         process.stderr.write(`${dir} is not a valid directory\n`);
         process.exit(0);
@@ -37,22 +36,18 @@ exports.watch = (ext, dir, opts) => {
 
       process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
 
-      process.nextTick(() => {
-
-        async.series([
-          moveExisting,
-          watch
-        ], err => {
-          if (err) {
-            log.clear();
-            return new Error('..encountered a problem watching the desktop');
-          }
-        })
+      async.series([
+        moveExisting,
+        watch
+      ], err => {
+        if (err) {
+          log.clear();
+          return new Error('..encountered a problem watching the desktop');
+        }
       })
     })
 
   return new Promise((resolve, reject) => {
-
     process.on('SIGINT', () => resolve({ moved, preserved }));
   })
 
