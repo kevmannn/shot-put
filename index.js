@@ -9,7 +9,7 @@ const log = require('single-line-log').stdout;
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 const desktop = home + `${path.sep}desktop`;
 
-exports.revert = () => {}
+// exports.revert = () => {}
 
 exports.watch = (ext, dir, opts) => {
 
@@ -55,7 +55,7 @@ exports.watch = (ext, dir, opts) => {
   })
 
   function moveFile(filename, oldPath, newPath) {
-    if (preserved.indexOf(filename) > -1) return null;
+    if (preserved.indexOf(filename) !== -1) return null;
 
     oldPath = oldPath || path.normalize(desktop + `${path.sep + filename}`);
     newPath = newPath || path.normalize(dest + `${path.sep + filename.replace(/\s/g, '_')}`);
@@ -67,20 +67,23 @@ exports.watch = (ext, dir, opts) => {
       if (err) return new Error(err);
 
       moved.push(filename);
+
       log(`..moved ${filename}\n`);
-      fs.unlink(oldPath, err => {});
+      fs.unlink(oldPath, err => err ? cb(err) : cb(null));
     })
 
     function read(cb) {
       fs.readFile(oldPath, (err, fileData) => {
         if (err) return cb(err);
+
         cb(null, fileData);
       })
     }
 
     function append(fileData, cb) {
       fs.appendFile(newPath, fileData, (err) => {
-        if (err) return cb(err);        
+        if (err) return cb(err);
+
         cb(null);
       })
     }
@@ -100,7 +103,9 @@ exports.watch = (ext, dir, opts) => {
 
   function watch() {
     fs.watch(desktop, (e, source) => {
-      if (e === 'rename' && path.extname(source) === ext) moveFile(source);
+      if (e === 'rename' && path.extname(source) === ext) {
+        moveFile(source);
+      }
     })
   }
 }

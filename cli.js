@@ -17,7 +17,9 @@ const cli = meow(`
     $ shot-put .js /documents/scripts
     $ shot-put .py /documents/scripts --preserve="i.py j.py"
 `, {
-  alias: { p: 'preserve' }
+  alias: {
+    p: 'preserve'
+  }
 })
 
 const input = cli.input;
