@@ -7,7 +7,7 @@ const pathExists = require('path-exists');
 const log = require('single-line-log').stdout;
 
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-const desktop = path.join(home, `${path.sep}desktop`);
+const desktop = path.join(home, 'desktop');
 
 // exports.revert = () => {}
 
