@@ -7,7 +7,7 @@ const pathExists = require('path-exists');
 const log = require('single-line-log').stdout;
 
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-const desktop = home + `${path.sep}desktop`;
+const desktop = path.join(home, `${path.sep}desktop`);
 
 // exports.revert = () => {}
 
@@ -58,20 +58,18 @@ exports.watch = (ext, dir, opts) => {
 
       files
         .filter(file => path.extname(file) === ext)
-        .forEach(f => moveFile(f, err => {
-          if (err) return cb(err);
-        }))
+        .forEach(f => moveFile(f))
 
       cb(null);
     })
   }
 
-  function watch(cb) {
+  function watch() {
     fs.watch(desktop, (e, source) => {
       if (e === 'rename' && path.extname(source) === ext) {
 
         moveFile(source, err => {
-          if (err) return cb(err);
+          if (err) return new Error(err);
 
           log(`..moved ${source}\n`);
         })
@@ -82,8 +80,8 @@ exports.watch = (ext, dir, opts) => {
   function moveFile(filename, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
 
-    const oldPath = path.normalize(desktop + `${path.sep + filename}`);
-    const newPath = path.normalize(dest + `${path.sep + filename.replace(/\s/g, '_')}`);
+    const oldPath = path.join(desktop, filename);
+    const newPath = path.join(dest, filename.replace(/\s/g, '_'));
 
     async.waterfall([
       read,
@@ -92,10 +90,9 @@ exports.watch = (ext, dir, opts) => {
       if (err) return cb(err);
 
       moved.push(filename);
-      
+
       fs.unlink(oldPath, err => {
         if (err) return cb(err);
-
         cb(null);
       })
     })
@@ -103,15 +100,13 @@ exports.watch = (ext, dir, opts) => {
     function read(cb) {
       fs.readFile(oldPath, (err, fileData) => {
         if (err) return cb(err);
-
         cb(null, fileData);
       })
     }
 
     function append(fileData, cb) {
-      fs.appendFile(newPath, fileData, (err) => {
+      fs.appendFile(newPath, fileData, err => {
         if (err) return cb(err);
-
         cb(null);
       })
     }
