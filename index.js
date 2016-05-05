@@ -44,32 +44,60 @@ exports.watch = (ext, dir, opts) => {
           moveExisting,
           watch
         ], err => {
-          if (err) {
-            log.clear();
-            return reject('..encountered a problem watching the desktop');
-          }
+
+          if (err) return reject(err);
         })
       })
 
     process.on('SIGINT', () => resolve({ moved, preserved }));
   })
 
-  function moveFile(filename, oldPath, newPath) {
+  function moveExisting(cb) {
+    fs.readdir(desktop, (err, files) => {
+      if (err) return cb(err);
+
+      files
+        .filter(file => path.extname(file) === ext)
+        .forEach(f => moveFile(f, err => {
+          if (err) return cb(err);
+        }))
+
+      cb(null);
+    })
+  }
+
+  function watch(cb) {
+    fs.watch(desktop, (e, source) => {
+      if (e === 'rename' && path.extname(source) === ext) {
+
+        moveFile(source, err => {
+          if (err) return cb(err);
+
+          log(`..moved ${source}\n`);
+        })
+      }
+    })
+  }
+
+  function moveFile(filename, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
 
-    oldPath = oldPath || path.normalize(desktop + `${path.sep + filename}`);
-    newPath = newPath || path.normalize(dest + `${path.sep + filename.replace(/\s/g, '_')}`);
+    const oldPath = path.normalize(desktop + `${path.sep + filename}`);
+    const newPath = path.normalize(dest + `${path.sep + filename.replace(/\s/g, '_')}`);
 
     async.waterfall([
       read,
       append
     ], err => {
-      if (err) return new Error(err);
+      if (err) return cb(err);
 
       moved.push(filename);
+      
+      fs.unlink(oldPath, err => {
+        if (err) return cb(err);
 
-      log(`..moved ${filename}\n`);
-      fs.unlink(oldPath, err => err ? cb(err) : cb(null));
+        cb(null);
+      })
     })
 
     function read(cb) {
@@ -87,25 +115,5 @@ exports.watch = (ext, dir, opts) => {
         cb(null);
       })
     }
-  }
-
-  function moveExisting(cb) {
-    fs.readdir(desktop, (err, files) => {
-      if (err) return cb(err);
-
-      files
-        .filter(file => path.extname(file) === ext)
-        .forEach(f => moveFile(f))
-
-      cb(null);
-    })
-  }
-
-  function watch() {
-    fs.watch(desktop, (e, source) => {
-      if (e === 'rename' && path.extname(source) === ext) {
-        moveFile(source);
-      }
-    })
   }
 }
