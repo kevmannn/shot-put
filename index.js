@@ -49,7 +49,10 @@ exports.watch = (ext, dir, opts) => {
         })
       })
 
-    process.on('SIGINT', () => resolve({ moved, preserved }));
+    process.on('SIGINT', () => {
+      log.clear();
+      resolve({ moved, preserved });
+    })
   })
 
   function moveExisting(cb) {
@@ -58,21 +61,26 @@ exports.watch = (ext, dir, opts) => {
 
       files
         .filter(file => path.extname(file) === ext)
-        .forEach(f => moveFile(f))
+        .forEach(f => moveFile(f, err => err ? cb(err) : null))
 
       cb(null);
     })
   }
 
-  function watch() {
+  function watch(cb) {
     fs.watch(desktop, (e, source) => {
       if (e === 'rename' && path.extname(source) === ext) {
 
-        moveFile(source, err => {
-          if (err) return new Error(err);
+        pathExists(path.join(desktop, source))
+          .then(result => {
+            if (!result) return;
 
-          log(`..moved ${source}\n`);
-        })
+            moveFile(source, err => {
+              if (err) return cb(err);
+
+              log(`..moved ${source}\n`);
+            })
+          })
       }
     })
   }
