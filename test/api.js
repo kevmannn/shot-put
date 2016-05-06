@@ -8,7 +8,7 @@ import test from 'ava';
 const ext = '.js';
 
 test.cb('.watch() rejects non-existing dest path', t => {
-  const dest = path.join(__dirname, `${path.sep}x`);
+  const dest = path.join(__dirname, 'x');
   t.plan(2);
 
   child_process.execFile('../cli.js', [ext, dest], (err, stdout, stderr) => {
