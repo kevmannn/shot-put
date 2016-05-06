@@ -13,7 +13,7 @@ const desktop = path.join(home, 'desktop');
 
 exports.watch = (ext, dir, opts) => {
 
-  if (![ext, dir].every(arg => typeof arg === 'string')) {
+  if (!([ext, dir].every(arg => typeof arg === 'string'))) {
     return new TypeError(`expected strings as first two arguments`);
   }
 
