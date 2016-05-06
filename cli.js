@@ -30,14 +30,13 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.exit(1);
 }
 
-// TODO: ..
 if (process.env.FORK) {
   setTimeout(() => {
     process.kill(process.pid, 'SIGINT');
   }, 0)
 }
 
-return shotPut.watch(input[0], input[1], flags)
+shotPut.watch(input[0], input[1], flags)
   .then(info => {
     const q = chalk.cyan(chalk.bold(`${info.moved.length}`));
     const d = chalk.green(chalk.bold(`${input[1]}`));
