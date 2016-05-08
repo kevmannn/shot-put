@@ -9,8 +9,6 @@ const log = require('single-line-log').stdout;
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 const desktop = path.join(home, 'desktop');
 
-// exports.revert = () => {}
-
 exports.watch = (ext, dir, opts) => {
 
   if (!([ext, dir].every(arg => typeof arg === 'string'))) {
