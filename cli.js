@@ -30,11 +30,7 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.exit(1);
 }
 
-if (process.env.FORK) {
-  setTimeout(() => {
-    process.kill(process.pid, 'SIGINT');
-  }, 0)
-}
+if (process.env.FORK) process.kill(process.pid, 'SIGINT');
 
 shotPut.watch(input[0], input[1], flags)
   .then(info => {
@@ -42,7 +38,8 @@ shotPut.watch(input[0], input[1], flags)
     const d = chalk.green(chalk.bold(`${input[1]}`));
 
     process.stdout.write(`\nmoved ${q} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${d}: \n`);
-    info.moved.forEach(file => console.log(`  ${chalk.italic(file)}`));
+
+    info.moved.forEach(file => process.stdout.write(`  ${chalk.italic(file)}\n`));
 
     if (process.env.FORK) {
       process.send({ movedFiles: info.moved, preservedFiles: info.preserved });

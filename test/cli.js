@@ -23,5 +23,3 @@ test.cb('--preserve protects files from movement', t => {
     t.end();
   })
 })
-
-test.todo('--default stores ext and dir values');
