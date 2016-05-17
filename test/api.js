@@ -43,5 +43,3 @@ test.cb('info.moved reflects number of files moved', t => {
 test.todo('.watch() adds file to dest');
 
 test.todo('.watch() removes file from desktop');
-
-test.todo('.revert() restores moved files to desktop');
