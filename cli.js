@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
+const path = require('path');
 const meow = require('meow');
 const chalk = require('chalk');
 const shotPut = require('./');
@@ -30,7 +31,15 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.exit(1);
 }
 
-if (process.env.FORK) process.kill(process.pid, 'SIGINT');
+if (process.env.FORK) {
+  process.nextTick(() => {
+    process.kill(process.pid, 'SIGINT');
+  })
+}
+
+shotPut.ps.on('watch', () => {
+  process.stdout.write(`watching ${path.sep}desktop for new ${chalk.bold(input[0])} files..\n`);
+})
 
 shotPut.watch(input[0], input[1], flags)
   .then(info => {

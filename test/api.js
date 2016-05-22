@@ -2,8 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 import test from 'ava';
-// import tempWrite from 'temp-write';
-// import uniqueTempDir from 'unique-temp-dir';
 
 const ext = '.js';
 

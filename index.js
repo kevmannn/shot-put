@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const EventEmitter = require('events').EventEmitter;
 const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
@@ -8,11 +9,14 @@ const log = require('single-line-log').stdout;
 
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 const desktop = path.join(home, 'desktop');
+const ps = new EventEmitter();
+
+exports.ps = ps;
 
 exports.watch = (ext, dir, opts) => {
 
   if (!([ext, dir].every(arg => typeof arg === 'string'))) {
-    return new TypeError(`expected strings as first two arguments`);
+    return new TypeError('expected strings as first two arguments');
   }
 
   dir = untildify(dir);
@@ -36,7 +40,7 @@ exports.watch = (ext, dir, opts) => {
         if (!exists) return reject(`${dir} is not a valid directory\n`);
         if (dest === desktop) return reject(`must target a directory other than ${path.sep + desktop}\n`);
 
-        process.stdout.write(`watching ${path.sep}desktop for new ${ext} files..\n`);
+        ps.emit('watch');
 
         async.series([
           moveExisting,
