@@ -18,7 +18,6 @@ shot-put <ext dir>
 ```
 
 ### Options
-* `-c`, `--cli` - generate cli-specific files
 Prevent specific files from ever being moved:
 ```console
 shot-put <ext dir> --preserve="<filenames>"
