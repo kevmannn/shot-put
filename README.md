@@ -14,7 +14,7 @@ npm install --global shot-put
 
 Watch `/desktop` for `ext` files and move them to `dir` (`dir` is relative to your user home):
 ```console
-shot-put <ext dir>
+$ shot-put <ext dir>
 ```
 
 ### Options
@@ -25,9 +25,9 @@ shot-put <ext dir> --preserve="<filenames>"
 
 ### Examples
 ```console
-shot-put .png /desktop/ideas/space
-shot-put .js /documents/scripts
-shot-put .py /documents/scripts --preserve="i.py j.py"
+$ shot-put .png /desktop/ideas/space
+$ shot-put .js /documents/scripts
+$ shot-put .py /documents/scripts --preserve="i.py j.py"
 ```
 
 ## License
