@@ -5,7 +5,6 @@ const EventEmitter = require('events').EventEmitter;
 const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
-const log = require('single-line-log').stdout;
 
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 const desktop = path.join(home, 'desktop');
@@ -52,7 +51,6 @@ exports.watch = (ext, dir, opts) => {
       })
 
     process.on('SIGINT', () => {
-      log.clear();
       resolve({ moved, preserved });
     })
   })
@@ -62,7 +60,7 @@ exports.watch = (ext, dir, opts) => {
       if (err) return cb(err);
 
       files
-        .filter(file => path.extname(file) === ext)
+        .filter(f => path.extname(f) === ext)
         .forEach(f => moveFile(f, err => err ? cb(err) : null))
 
       cb(null);
@@ -80,7 +78,7 @@ exports.watch = (ext, dir, opts) => {
             moveFile(source, err => {
               if (err) return cb(err);
 
-              log(`..moved ${source}\n`);
+              ps.emit('moved', source);
             })
           })
       }
