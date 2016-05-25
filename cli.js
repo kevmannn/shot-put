@@ -51,11 +51,9 @@ shotPut.watch(input[0], input[1], flags)
     const q = chalk.cyan(chalk.bold(`${info.moved.length}`));
     const d = chalk.green(chalk.bold(`${input[1]}`));
 
-    log.clear();
+    process.stdout.write(`\n\nmoved ${q} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${d}: \n`);
 
-    process.stdout.write(`\nmoved ${q} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${d}: \n`);
-
-    info.moved.forEach(file => process.stdout.write(`  ${chalk.italic(file)}\n`));
+    info.moved.forEach(file => process.stdout.write(`  ${chalk.italic(chalk.dim(file))}\n`));
 
     if (process.env.FORK) {
       process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
