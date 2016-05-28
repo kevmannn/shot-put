@@ -4,6 +4,7 @@
 const path = require('path');
 const meow = require('meow');
 const chalk = require('chalk');
+const chalkForm = require('chalk-form');
 const log = require('single-line-log').stdout;
 const shotPut = require('./');
 
@@ -23,8 +24,6 @@ const cli = meow(`
     p: 'preserve'
   }
 })
-
-const chalkForm = methods => str => methods.reduce((p, c) => chalk[c](p), str);
 
 const input = cli.input;
 const flags = cli.flags;
