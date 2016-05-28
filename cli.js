@@ -24,6 +24,8 @@ const cli = meow(`
   }
 })
 
+const chalkForm = methods => str => methods.reduce((p, c) => chalk[c](p), str);
+
 const input = cli.input;
 const flags = cli.flags;
 
@@ -36,10 +38,6 @@ if (process.env.FORK) {
   process.nextTick(() => {
     process.kill(process.pid, 'SIGINT');
   })
-}
-
-const chalkForm = methods => {
-  return str => methods.reduce((p, c) => chalk[c](p), str);
 }
 
 shotPut.ps.on('watch', () => {
