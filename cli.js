@@ -38,22 +38,27 @@ if (process.env.FORK) {
   })
 }
 
+const chalkForm = methods => {
+  return str => methods.reduce((p, c) => chalk[c](p), str);
+}
+
 shotPut.ps.on('watch', () => {
   process.stdout.write(`watching ${path.sep}desktop for new ${chalk.bold(input[0])} files..\n`);
 })
 
 shotPut.ps.on('moved', file => {
-  log(`..moved ${chalk.italic(chalk.dim(file))}\n`);
+  log(`..moved ${chalkForm(['italic', 'dim'])(file)}\n`);
 })
 
 shotPut.watch(input[0], input[1], flags)
   .then(info => {
-    const q = chalk.cyan(chalk.bold(`${info.moved.length}`));
-    const d = chalk.green(chalk.bold(`${input[1]}`));
+    const numMoved = chalkForm(['cyan', 'bold'])(info.moved.length + '');
+    const dest = chalkForm(['green', 'bold'])(input[1]);
+    const str = `\n\nmoved ${numMoved} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${dest}:\n`;
 
-    process.stdout.write(`\n\nmoved ${q} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${d}: \n`);
+    process.stdout.write(str);
 
-    info.moved.forEach(file => process.stdout.write(`  ${chalk.italic(chalk.dim(file))}\n`));
+    info.moved.forEach(file => process.stdout.write(`  ${chalkForm(['italic', 'dim'])(file)}\n`));
 
     if (process.env.FORK) {
       process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
