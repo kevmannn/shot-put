@@ -3,7 +3,6 @@
 
 const path = require('path');
 const meow = require('meow');
-const chalk = require('chalk');
 const chalkForm = require('chalk-form');
 const log = require('single-line-log').stdout;
 const shotPut = require('./');
@@ -40,7 +39,8 @@ if (process.env.FORK) {
 }
 
 shotPut.ps.on('watch', () => {
-  process.stdout.write(`watching ${path.sep}desktop for new ${chalk.bold(input[0])} files..\n`);
+  const str = `watching ${chalkForm(['dim'])(path.sep + 'desktop')} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`;
+  process.stdout.write(str);
 })
 
 shotPut.ps.on('moved', file => {
@@ -51,9 +51,8 @@ shotPut.watch(input[0], input[1], flags)
   .then(info => {
     const numMoved = chalkForm(['cyan', 'bold'])(info.moved.length + '');
     const dest = chalkForm(['green', 'bold'])(input[1]);
-    const str = `\n\nmoved ${numMoved} ${input[0]} file${info.moved.length === 1 ? '' : 's'} to ${dest}:\n`;
 
-    process.stdout.write(str);
+    process.stdout.write(`\n\nmoved ${numMoved} ${input[0]} file${info.moved.length === 1 ? '' : 's'} from ${chalkForm(['dim'])(path.sep + 'desktop')} to ${dest}:\n`);
 
     info.moved.forEach(file => process.stdout.write(`  ${chalkForm(['italic', 'dim'])(file)}\n`));
 
@@ -64,5 +63,5 @@ shotPut.watch(input[0], input[1], flags)
     process.exit(0);
   })
   .catch(err => {
-    process.stderr.write(chalk.red(err));
+    process.stderr.write(chalkForm(['red', 'bold'])(err));
   })
