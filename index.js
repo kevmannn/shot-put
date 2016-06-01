@@ -99,10 +99,7 @@ exports.watch = (ext, dir, opts) => {
 
       moved.push(filename);
 
-      fs.unlink(oldPath, err => {
-        if (err) return cb(err);
-        cb(null);
-      })
+      process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
     })
 
     function read(cb) {
