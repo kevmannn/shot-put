@@ -19,7 +19,7 @@ exports.ps = ps;
 
 exports.watch = (ext, dir, opts) => {
   opts = opts || {};
-  
+
   if (!([ext, dir].every(arg => typeof arg === 'string'))) {
     return new TypeError('expected strings as first two arguments');
   }
@@ -33,7 +33,6 @@ exports.watch = (ext, dir, opts) => {
   }
 
   return new Promise((resolve, reject) => {
-
     pathExists(dest)
       .then(exists => {
 
@@ -45,10 +44,7 @@ exports.watch = (ext, dir, opts) => {
         async.series([
           moveExisting,
           watch
-        ], err => {
-
-          if (err) return reject(err);
-        })
+        ], err => err ? reject(err) : true)
       })
 
     process.on('SIGINT', () => {
