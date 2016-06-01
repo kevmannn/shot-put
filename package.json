@@ -4,7 +4,8 @@
   "description": "CLI tool to watch desktop for files of a given extension and automatically move them to a given directory",
   "main": "index.js",
   "scripts": {
-    "test": "ava --verbose"
+    "test": "ava --verbose",
+    "watch": "npm t -- -w"
   },
   "bin": "cli.js",
   "engines": {
