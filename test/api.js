@@ -4,11 +4,16 @@ import { execFile } from 'child_process';
 import { spawn } from 'child_process';
 import { fork } from 'child_process';
 import test from 'ava';
+// import rimraf from 'rimraf';
 
 const ext = '.js';
+const dest = path.join(__dirname, 'x');
+const env = Object.create(process.env);
+env.FORK = true;
+
+// test.beforeEach(t => {})
 
 test.cb('.watch() rejects non-existing dest path', t => {
-  const dest = path.join(__dirname, 'x');
   t.plan(2);
 
   execFile('../cli.js', [ext, dest], (err, stdout, stderr) => {
@@ -29,9 +34,6 @@ test.cb('.watch() listens when given valid dest path', t => {
 })
 
 test.cb('info.moved reflects number of files moved', t => {
-  const env = Object.create(process.env);
-  env.FORK = true;
-
   const sp = fork('../cli.js', [ext, __dirname], { env });
 
   sp.on('message', m => {
@@ -40,6 +42,10 @@ test.cb('info.moved reflects number of files moved', t => {
   })
 })
 
-test.todo('.watch() adds file to dest');
+// test.skip('.watch() adds file to dest', t => {
+//   const sp = spawn('../cli.js', [ext, __dirname], { env });
 
-test.todo('.watch() removes file from desktop');
+//   sp.on('close', code => {})
+// })
+
+// test.skip('.watch() removes file from desktop', t => {})

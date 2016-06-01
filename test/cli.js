@@ -1,5 +1,5 @@
-import { fork } from 'child_process';
 import { spawn } from 'child_process';
+import { fork } from 'child_process';
 import test from 'ava';
 
 const ext = '.js';
