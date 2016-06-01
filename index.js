@@ -66,19 +66,14 @@ exports.watch = (ext, dir, opts) => {
 
   function watch(cb) {
     fs.watch(desktop, (e, source) => {
-      if (e === 'rename' && path.extname(source) === ext) {
+      if (!(e === 'rename' && path.extname(source) === ext)) return;
 
-        pathExists(path.join(desktop, source))
-          .then(result => {
-            if (!result) return;
+      pathExists(path.join(desktop, source))
+        .then(result => {
+          if (!result) return;
 
-            moveFile(source, err => {
-              if (err) return cb(err);
-
-              ps.emit('moved', source);
-            })
-          })
-      }
+          moveFile(source, err => err ? cb(err) : ps.emit('moved', source));
+        })
     })
   }
 
