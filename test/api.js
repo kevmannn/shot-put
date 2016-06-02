@@ -5,13 +5,15 @@ import { spawn } from 'child_process';
 import { fork } from 'child_process';
 import test from 'ava';
 // import rimraf from 'rimraf';
+// import mkdirp from 'mkdirp';
 
 const ext = '.js';
 const dest = path.join(__dirname, 'x');
 const env = Object.create(process.env);
+
 env.FORK = true;
 
-// test.beforeEach(t => {})
+test.beforeEach(t => {})
 
 test.cb('.watch() rejects non-existing dest path', t => {
   t.plan(2);
