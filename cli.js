@@ -26,6 +26,8 @@ const cli = meow(`
 
 const input = cli.input;
 const flags = cli.flags;
+const source = chalkForm(['dim'])(path.sep + 'desktop');
+const dest = chalkForm(['green', 'bold'])(input[1]);
 
 if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
   process.stderr.write(`Invoked with invalid ext and dir. Type 'shotPut --help' for examples\n`);
@@ -33,14 +35,11 @@ if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
 }
 
 if (process.env.FORK) {
-  process.nextTick(() => {
-    process.kill(process.pid, 'SIGINT');
-  })
+  process.nextTick(() => process.kill(process.pid, 'SIGINT'));
 }
 
 shotPut.ps.on('watch', () => {
-  const str = `watching ${chalkForm(['dim'])(path.sep + 'desktop')} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`;
-  process.stdout.write(str);
+  process.stdout.write(`watching ${source} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`);
 })
 
 shotPut.ps.on('moved', file => {
@@ -49,10 +48,10 @@ shotPut.ps.on('moved', file => {
 
 shotPut.watch(input[0], input[1], flags)
   .then(info => {
-    const numMoved = chalkForm(['cyan', 'bold'])(info.moved.length + '');
-    const dest = chalkForm(['green', 'bold'])(input[1]);
+    const movement = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
+    const str = `\n\nmoved ${movement} file${info.moved.length === 1 ? '' : 's'} from ${source} to ${dest}:\n`;
 
-    process.stdout.write(`\n\nmoved ${numMoved} ${input[0]} file${info.moved.length === 1 ? '' : 's'} from ${chalkForm(['dim'])(path.sep + 'desktop')} to ${dest}:\n`);
+    process.stdout.write(str);
 
     info.moved.forEach(file => process.stdout.write(`  ${chalkForm(['italic', 'dim'])(file)}\n`));
 
