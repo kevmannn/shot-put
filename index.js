@@ -6,14 +6,13 @@ const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
 
+const ps = new EventEmitter();
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 const desktop = path.join(home, 'desktop');
 const parseHome = str => str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
 
 let moved = [];
 let preserved = [];
-
-const ps = new EventEmitter();
 
 exports.ps = ps;
 
@@ -83,29 +82,15 @@ exports.watch = (ext, dir, opts) => {
     const oldPath = path.join(desktop, filename);
     const newPath = path.join(dest, filename.replace(/\s/g, '_'));
 
-    async.waterfall([
-      read,
-      append
-    ], err => {
-      if (err) return cb(err);
+    const read = fs.createReadStream(oldPath);
 
+    read.pipe(fs.createWriteStream(newPath));
+    
+    read.on('error', err => cb(err));
+    read.on('end', () => {
       moved.push(filename);
 
       process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
     })
-
-    function read(cb) {
-      fs.readFile(oldPath, (err, fileData) => {
-        if (err) return cb(err);
-        cb(null, fileData);
-      })
-    }
-
-    function append(fileData, cb) {
-      fs.appendFile(newPath, fileData, err => {
-        if (err) return cb(err);
-        cb(null);
-      })
-    }
   }
 }
