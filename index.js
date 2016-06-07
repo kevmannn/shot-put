@@ -7,9 +7,13 @@ const untildify = require('untildify');
 const pathExists = require('path-exists');
 
 const ps = new EventEmitter();
+
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 const desktop = path.join(home, 'desktop');
-const parseHome = str => str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
+
+const parseHome = str => {
+  return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
+}
 
 let moved = [];
 let preserved = [];

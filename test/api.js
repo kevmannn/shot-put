@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { execFile } from 'child_process';
-import { spawn } from 'child_process';
-import { fork } from 'child_process';
+import { execFile, spawn, fork } from 'child_process';
 import test from 'ava';
 // import rimraf from 'rimraf';
 // import mkdirp from 'mkdirp';
@@ -49,10 +47,10 @@ test.cb('info.moved reflects number of files moved', t => {
 //     fs.readdir(dest, (err, data) => {
 //       t.ifError(err);
 
-//       t.true(data.indexOf(__filename) !== -1);
+//       t.true(data.indexOf(path.basename(__filename)) !== -1);
 //       t.end();
 //     })
 //   })
 // })
 
-// test.skip('.watch() removes file from desktop', t => {})
+test.skip('.watch() removes file from desktop', t => {})
