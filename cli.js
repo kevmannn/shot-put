@@ -44,12 +44,11 @@ shotPut.watch(input[0], input[1], flags)
   .then(info => {
     if (process.env.FORK) process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
     
-    const movement = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
-    const str = `\n\nmoved ${movement} file${info.moved.length === 1 ? '' : 's'} from ${source} to ${dest}:\n`;
+    const numMoved = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
+    const str = `\n\nmoved ${numMoved} file${info.moved.length === 1 ? '' : 's'} from ${source} to ${dest}:\n`;
 
     process.stdout.write(str);
-
-    info.moved.forEach(file => process.stdout.write(`  ${chalkForm(['italic', 'dim'])(file)}\n`));
+    info.moved.forEach(f => process.stdout.write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
 
     process.exit(0);
   })
