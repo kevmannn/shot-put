@@ -27,7 +27,7 @@ exports.watch = (ext, destPath, opts) => {
 
   let moved = [];
   let preserved = [];
-  const dest = parseHome(untildify(destPath));
+  destPath = parseHome(untildify(destPath));
 
   if (ext.charAt(0) !== '.') ext = '.' + ext;
   if (process.env.FORK) source = path.join('output', 'x');
@@ -37,11 +37,12 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   return new Promise((resolve, reject) => {
-    pathExists(dest)
-      .then(exists => {
+    process.on('SIGINT', () => resolve({ moved, preserved }));
 
+    pathExists(destPath)
+      .then(exists => {
         if (!exists) return reject(`${destPath} is not a valid directory\n`);
-        if (dest === source) return reject(`must target a directory other than ${source}\n`);
+        if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
         ps.emit('watch');
 
@@ -50,10 +51,6 @@ exports.watch = (ext, destPath, opts) => {
           watch
         ], err => err ? reject(err) : true)
       })
-
-    process.on('SIGINT', () => {
-      resolve({ moved, preserved });
-    })
   })
 
   function moveExisting(cb) {
@@ -85,7 +82,7 @@ exports.watch = (ext, destPath, opts) => {
     if (preserved.indexOf(filename) !== -1) return null;
 
     const oldPath = path.join(source, filename);
-    const newPath = path.join(dest, filename.replace(/\s/g, '_'));
+    const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
 
     const read = fs.createReadStream(oldPath);
 
