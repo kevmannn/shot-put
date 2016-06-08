@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { execFile, spawn, fork } from 'child_process';
 import test from 'ava';
-// import rimraf from 'rimraf';
-// import mkdirp from 'mkdirp';
+import rimraf from 'rimraf';
+import mkdirp from 'mkdirp';
 
 const ext = '.js';
 const dest = path.join(__dirname, 'x');

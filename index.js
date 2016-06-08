@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events').EventEmitter;
+const _ = require('lodash');
 const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
@@ -15,9 +16,6 @@ const parseHome = str => {
   return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
 }
 
-let moved = [];
-let preserved = [];
-
 exports.ps = ps;
 
 exports.rename = str => {}
@@ -25,10 +23,10 @@ exports.rename = str => {}
 exports.watch = (ext, dir, opts) => {
   opts = opts || {};
 
-  if (!([ext, dir].every(arg => typeof arg === 'string'))) {
-    return new TypeError('expected strings as first two arguments');
-  }
+  if (!_.every([ext, dir], String)) return new TypeError(`expected strings as first two args`);
 
+  let moved = [];
+  let preserved = [];
   const dest = parseHome(untildify(dir));
 
   if (ext.charAt(0) !== '.') ext = '.' + ext;
