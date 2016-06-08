@@ -6,18 +6,20 @@ import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 
 const ext = '.js';
-const source = path.join(__dirname, 'x');
-const dest = path.join(__dirname, 'y');
+const source = path.resolve('..', 'output', 'x');
+const dest = path.resolve('..', 'output', 'y');
 const env = Object.create(process.env);
 
 env.FORK = true;
 
-test.beforeEach(t => {
-  rimraf(dest, err => {
+const restore = (t, dir) => {
+  rimraf(dir, err => {
     t.ifError(err);
-    mkdirp(dest, err => t.ifError(err));
+    mkdirp(dir, err => t.ifError(err));
   })
-})
+}
+
+test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
 
 test.cb('.watch() rejects non-existing dest path', t => {
   const nonDest = path.join(dest, 'z');
@@ -49,7 +51,6 @@ test.cb('info.moved reflects number of files moved', t => {
 })
 
 test.skip('.watch() adds file to dest', t => {
-  const sPut = () => spawn('../cli.js', [ext, dest]);
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
 
   read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
@@ -57,13 +58,17 @@ test.skip('.watch() adds file to dest', t => {
   read.on('error', err => t.ifError(err));
   read.on('end', sPut);
 
-  sPut.on('close', code => {
-    fs.readdir(dest, (err, data) => {
-      t.ifError(err);
+  function sPut() {
+    const sp = spawn('../cli.js', [ext, dest]);
 
-      t.true(data.indexOf(path.basename('index.js')) !== -1);
-      t.is(code, 0);
-      t.end();
+    sp.on('close', code => {
+      fs.readdir(dest, (err, data) => {
+        t.ifError(err);
+
+        t.true(data.indexOf('index.js') !== -1);
+        t.is(code, 0);
+        t.end();
+      })
     })
-  })
+  }
 })
