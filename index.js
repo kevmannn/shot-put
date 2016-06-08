@@ -23,7 +23,9 @@ exports.rename = str => {}
 exports.watch = (ext, destPath, opts) => {
   opts = opts || {};
 
-  if (!_.every([ext, destPath], String)) return new TypeError(`expected strings as first two args`);
+  if (!_.every([ext, destPath], x => typeof x === 'string')) {
+    throw new TypeError(`expected strings as first two args`);
+  }
 
   let moved = [];
   let preserved = [];

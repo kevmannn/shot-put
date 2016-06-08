@@ -26,17 +26,11 @@ const cli = meow(`
 
 const input = cli.input;
 const flags = cli.flags;
+
 const source = chalkForm(['dim'])(path.sep + 'desktop');
 const dest = chalkForm(['green', 'bold'])(input[1]);
 
-if (input.length < 2 || input.some(arg => typeof arg !== 'string')) {
-  process.stderr.write(`Invoked with invalid ext and dir. Type 'shotPut --help' for examples\n`);
-  process.exit(1);
-}
-
-if (process.env.FORK) {
-  process.nextTick(() => process.kill(process.pid, 'SIGINT'));
-}
+if (process.env.FORK) process.nextTick(() => process.kill(process.pid, 'SIGINT'));
 
 shotPut.ps.on('watch', () => {
   process.stdout.write(`watching ${source} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`);
