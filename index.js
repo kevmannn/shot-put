@@ -30,7 +30,7 @@ exports.watch = (ext, destPath, opts) => {
   const dest = parseHome(untildify(destPath));
 
   if (ext.charAt(0) !== '.') ext = '.' + ext;
-  if (process.env.FORK) source = path.join('test', 'x');
+  if (process.env.FORK) source = path.join('output', 'x');
 
   if (typeof opts.preserve !== 'undefined') {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
