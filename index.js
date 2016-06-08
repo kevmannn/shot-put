@@ -20,6 +20,8 @@ let preserved = [];
 
 exports.ps = ps;
 
+exports.rename = str => {}
+
 exports.watch = (ext, dir, opts) => {
   opts = opts || {};
 
@@ -40,7 +42,7 @@ exports.watch = (ext, dir, opts) => {
       .then(exists => {
 
         if (!exists) return reject(`${dir} is not a valid directory\n`);
-        if (dest === desktop) return reject(`must target a directory other than ${path.sep + desktop}\n`);
+        if (dest === desktop) return reject(`must target a directory other than ${desktop}\n`);
 
         ps.emit('watch');
 

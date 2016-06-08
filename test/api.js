@@ -11,13 +11,20 @@ const env = Object.create(process.env);
 
 env.FORK = true;
 
-// test.beforeEach(t => {})
+// test.beforeEach(t => {
+//   rimraf(dest, err => {
+//     t.ifError(err);
+//     mkdirp(dest, err => t.ifError(err));
+//   })
+// })
 
 test.cb('.watch() rejects non-existing dest path', t => {
-  execFile('../cli.js', [ext, dest], (err, stdout, stderr) => {
+  const nonDest = path.join(dest, 'y');
+
+  execFile('../cli.js', [ext, nonDest], (err, stdout, stderr) => {
     t.ifError(err);
     
-    t.is(stderr, `${dest} is not a valid directory\n`);
+    t.is(stderr, `${nonDest} is not a valid directory\n`);
     t.end();
   })
 })
@@ -53,4 +60,4 @@ test.cb('info.moved reflects number of files moved', t => {
 //   })
 // })
 
-test.skip('.watch() removes file from desktop', t => {})
+// test.skip('.watch() removes file from desktop', t => {})
