@@ -61,7 +61,7 @@ test.skip('.watch() adds file to dest', t => {
     fs.readdir(dest, (err, data) => {
       t.ifError(err);
 
-      t.true(data.indexOf(path.basename(__filename)) !== -1);
+      t.true(data.indexOf(path.basename('index.js')) !== -1);
       t.is(code, 0);
       t.end();
     })
