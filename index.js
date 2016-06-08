@@ -10,7 +10,7 @@ const pathExists = require('path-exists');
 const ps = new EventEmitter();
 
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-const desktop = path.join(home, 'desktop');
+let source = path.join(home, 'desktop');
 
 const parseHome = str => {
   return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
@@ -20,16 +20,17 @@ exports.ps = ps;
 
 exports.rename = str => {}
 
-exports.watch = (ext, dir, opts) => {
+exports.watch = (ext, destPath, opts) => {
   opts = opts || {};
 
-  if (!_.every([ext, dir], String)) return new TypeError(`expected strings as first two args`);
+  if (!_.every([ext, destPath], String)) return new TypeError(`expected strings as first two args`);
 
   let moved = [];
   let preserved = [];
-  const dest = parseHome(untildify(dir));
+  const dest = parseHome(untildify(destPath));
 
   if (ext.charAt(0) !== '.') ext = '.' + ext;
+  if (process.env.FORK) source = path.join('test', 'x');
 
   if (typeof opts.preserve !== 'undefined') {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
@@ -39,8 +40,8 @@ exports.watch = (ext, dir, opts) => {
     pathExists(dest)
       .then(exists => {
 
-        if (!exists) return reject(`${dir} is not a valid directory\n`);
-        if (dest === desktop) return reject(`must target a directory other than ${desktop}\n`);
+        if (!exists) return reject(`${destPath} is not a valid directory\n`);
+        if (dest === source) return reject(`must target a directory other than ${source}\n`);
 
         ps.emit('watch');
 
@@ -56,7 +57,7 @@ exports.watch = (ext, dir, opts) => {
   })
 
   function moveExisting(cb) {
-    fs.readdir(desktop, (err, files) => {
+    fs.readdir(source, (err, files) => {
       if (err) return cb(err);
 
       files
@@ -68,10 +69,10 @@ exports.watch = (ext, dir, opts) => {
   }
 
   function watch(cb) {
-    fs.watch(desktop, (e, source) => {
+    fs.watch(source, (e, source) => {
       if (!(e === 'rename' && path.extname(source) === ext)) return;
 
-      pathExists(path.join(desktop, source))
+      pathExists(path.join(source, source))
         .then(exists => {
           if (!exists) return;
 
@@ -83,7 +84,7 @@ exports.watch = (ext, dir, opts) => {
   function moveFile(filename, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
 
-    const oldPath = path.join(desktop, filename);
+    const oldPath = path.join(source, filename);
     const newPath = path.join(dest, filename.replace(/\s/g, '_'));
 
     const read = fs.createReadStream(oldPath);

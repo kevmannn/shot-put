@@ -2,12 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { execFile, spawn, fork } from 'child_process';
 import test from 'ava';
-import async from 'async';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 
 const ext = '.js';
-const dest = path.join(__dirname, 'x');
+const source = path.join(__dirname, 'x');
+const dest = path.join(__dirname, 'y');
 const env = Object.create(process.env);
 
 env.FORK = true;
@@ -20,7 +20,7 @@ test.beforeEach(t => {
 })
 
 test.cb('.watch() rejects non-existing dest path', t => {
-  const nonDest = path.join(dest, 'y');
+  const nonDest = path.join(dest, 'z');
 
   execFile('../cli.js', [ext, nonDest], (err, stdout, stderr) => {
     t.ifError(err);
@@ -48,18 +48,22 @@ test.cb('info.moved reflects number of files moved', t => {
   })
 })
 
-// test.skip('.watch() adds file to dest', t => {
-//   const sPut = spawn('../cli.js', [ext, __dirname]);
+test.skip('.watch() adds file to dest', t => {
+  const sPut = () => spawn('../cli.js', [ext, dest]);
+  const read = fs.createReadStream(path.resolve('..', 'index.js'));
 
-//   sPut.on('close', code => {
-//     fs.readdir(dest, (err, data) => {
-//       t.ifError(err);
+  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
 
-//       t.true(data.indexOf(path.basename(__filename)) !== -1);
-//       t.is(code, 0);
-//       t.end();
-//     })
-//   })
-// })
+  read.on('error', err => t.ifError(err));
+  read.on('end', sPut);
 
-test.skip('.watch() removes file from desktop', t => {})
+  sPut.on('close', code => {
+    fs.readdir(dest, (err, data) => {
+      t.ifError(err);
+
+      t.true(data.indexOf(path.basename(__filename)) !== -1);
+      t.is(code, 0);
+      t.end();
+    })
+  })
+})
