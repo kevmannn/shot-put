@@ -59,14 +59,15 @@ test.skip('`.watch()` transfers file from `source` to `dest`', t => {
   read.on('end', sPut);
 
   function sPut() {
-    const sp = spawn('../cli.js', [ext, dest]);
+    const sPut = fork('../cli.js', [ext, dest], { env });
 
-    sp.on('close', code => {
-      fs.readdir(dest, (err, data) => {
+    sPut.on('message', m => {
+      t.is(m.movedFiles.length, 1);
+
+      fs.readdir(dest, (err, contents) => {
         t.ifError(err);
 
-        t.true(data.indexOf('index.js') !== -1);
-        t.is(code, 0);
+        t.true(contents.indexOf('index.js') !== -1);
         t.end();
       })
     })

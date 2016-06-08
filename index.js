@@ -31,8 +31,8 @@ exports.watch = (ext, destPath, opts) => {
   let preserved = [];
   destPath = parseHome(untildify(destPath));
 
+  if (process.env.FORK) source = path.join(__dirname, 'output', 'x');
   if (ext.charAt(0) !== '.') ext = '.' + ext;
-  if (process.env.FORK) source = path.join('output', 'x');
 
   if (typeof opts.preserve !== 'undefined') {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
