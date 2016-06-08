@@ -3,6 +3,7 @@ import test from 'ava';
 
 const ext = '.js';
 const env = Object.create(process.env);
+
 env.FORK = true;
 
 test.cb('cli rejects non-string input args', t => {

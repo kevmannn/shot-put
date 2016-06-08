@@ -72,8 +72,8 @@ exports.watch = (ext, dir, opts) => {
       if (!(e === 'rename' && path.extname(source) === ext)) return;
 
       pathExists(path.join(desktop, source))
-        .then(result => {
-          if (!result) return;
+        .then(exists => {
+          if (!exists) return;
 
           moveFile(source, err => err ? cb(err) : ps.emit('moved', source));
         })
