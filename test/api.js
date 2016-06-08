@@ -33,10 +33,10 @@ test.cb('`.watch()` rejects non-existing `dest` path', t => {
 })
 
 test.cb('`.watch()` listens when given valid `dest` path', t => {
-  const sPut = spawn('../cli.js', [ext, __dirname]);
+  const sPut = spawn('../cli.js', [ext, __dirname], { env });
 
   sPut.stdout.on('data', data => {
-    t.is(data.toString(), `watching ${path.sep}desktop for new ${ext} files..\n`)
+    t.is(data.toString(), `watching ${source} for new ${ext} files..\n`)
     t.end();
   })
 })

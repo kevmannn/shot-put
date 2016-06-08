@@ -27,12 +27,13 @@ const cli = meow(`
 const input = cli.input;
 const flags = cli.flags;
 
-const source = chalkForm(['dim'])(path.sep + 'desktop');
+let source = '';
 const dest = chalkForm(['green', 'bold'])(input[1]);
 
 if (process.env.FORK) process.nextTick(() => process.kill(process.pid, 'SIGINT'));
 
-shotPut.ps.on('watch', () => {
+shotPut.ps.on('watch', src => {
+  source = chalkForm(['dim'])(src);
   process.stdout.write(`watching ${source} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`);
 })
 
@@ -45,11 +46,10 @@ shotPut.watch(input[0], input[1], flags)
     if (process.env.FORK) process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
     
     const numMoved = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
-    const str = `\n\nmoved ${numMoved} file${info.moved.length === 1 ? '' : 's'} from ${source} to ${dest}:\n`;
 
-    process.stdout.write(str);
+    process.stdout.write(`\n\nmoved ${numMoved} file${info.moved.length === 1 ? '' : 's'} from ${source} to ${dest}:\n`);
+
     info.moved.forEach(f => process.stdout.write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
-
     process.exit(0);
   })
   .catch(err => {

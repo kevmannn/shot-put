@@ -46,7 +46,7 @@ exports.watch = (ext, destPath, opts) => {
         if (!exists) return reject(`${destPath} is not a valid directory\n`);
         if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
-        ps.emit('watch');
+        ps.emit('watch', source);
 
         async.series([
           moveExisting,
