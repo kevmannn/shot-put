@@ -28,7 +28,7 @@ const input = cli.input;
 const flags = cli.flags;
 
 let sourceStr = '';
-const dest = chalkForm(['green', 'bold'])(input[1]);
+const destStr = chalkForm(['green', 'bold'])(input[1]);
 
 const write = str => process.stdout.write(str);
 
@@ -53,7 +53,7 @@ shotPut.watch(input[0], input[1], flags)
       process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
     }
     
-    write(`\n\nmoved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${dest}:\n`);
+    write(`\n\nmoved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
 
     info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
     process.exit(0);

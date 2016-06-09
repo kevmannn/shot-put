@@ -23,6 +23,7 @@
     "directory",
     "fs",
     "file-system",
+    "osx",
     "screencap",
     "screenshot",
     "transfer"
