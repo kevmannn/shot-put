@@ -32,10 +32,6 @@ const destStr = chalkForm(['green', 'bold'])(input[1]);
 
 const write = str => process.stdout.write(str);
 
-if (process.env.FORK) {
-  process.nextTick(() => process.kill(process.pid, 'SIGINT'));
-}
-
 shotPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
   write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`);

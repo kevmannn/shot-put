@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { execFile, spawn, fork } from 'child_process';
+import { execFile, fork } from 'child_process';
 import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
@@ -32,11 +32,11 @@ test.cb('`.watch()` rejects non-existing `dest` path', t => {
   })
 })
 
-test.cb('`.watch()` listens when given valid `dest` path', t => {
-  const sPut = spawn('../cli.js', [ext, __dirname], { env });
+test.skip('`.watch()` listens when given valid `dest` path', t => {
+  const sPut = fork('../cli.js', [ext, __dirname], { env });
 
-  sPut.stdout.on('data', d => {
-    t.is(d.toString(), `watching ${source} for new ${ext} files..\n`)
+  sPut.on('message', m => {
+    t.truthy(m.src);
     t.end();
   })
 })

@@ -31,7 +31,11 @@ exports.watch = (ext, destPath, opts) => {
   let preserved = [];
   destPath = parseHome(untildify(destPath));
 
-  if (process.env.FORK) source = path.join(__dirname, 'output', 'x');
+  if (process.env.FORK) {
+    source = path.join(__dirname, 'output', 'x');
+    process.nextTick(() => process.kill(process.pid, 'SIGINT'));
+  }
+
   if (ext.charAt(0) !== '.') ext = '.' + ext;
 
   if (typeof opts.preserve !== 'undefined') {
