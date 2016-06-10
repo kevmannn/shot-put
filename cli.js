@@ -30,6 +30,7 @@ const negation = new Set(['\u001B', '\u007F']); // esc, delete
 const resolution = new Set(['\r', '\t', '\u0020']); // enter, tab, space
 
 const write = str => process.stdout.write(str);
+const restore = () => process.stdin.removeAllListeners('readable');
 
 sPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
@@ -64,7 +65,10 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
 function promptRename(file) {
   log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')}\n`);
 
-  // setTimeout(() => ansi.eraseLines(1), 10 * 1000)
+  setTimeout(() => {
+    ansi.eraseLines(1);
+    restore();
+  }, 10 * 1000);
 
   process.stdin.setRawMode(true);
   process.stdin.on('readable', () => {
@@ -80,6 +84,6 @@ function initRename(filename) {
   process.stdin.on('readable', () => {
     const userIn = process.stdin.read();
 
-    if (userIn === '\r') sPut.rename(userIn, err => {})
+    if (userIn === '\r') sPut.rename(userIn, err => ansi.eraseLines(1));
   })
 }
