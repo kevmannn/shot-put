@@ -35,7 +35,11 @@ sPut.ps.on('watch', src => {
   write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-sPut.ps.on('moved', file => {
+// sPut.ps.on('partial', chunk => log(chunk));
+
+// sPut.ps.on('detect', promptRename);
+
+sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
   // promptRename(file);
 })
@@ -58,16 +62,20 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
   })
 
 function promptRename(file) {
-  log(`> rename ${file} (y/n) ?\n`);
+  log(`> rename ${file}? (y/n)\n`);
 
   process.stdin.setRawMode(true);
-  process.stdin.on('readable', initRename.bind(null, file, process.stdin.read()));
+  process.stdin.on('readable', () => {
+    const yn = process.stdin.read();
+
+    if (negation.has(yn) || yn === null) return false;
+    else initRename(file);
+  })
 }
 
-function initRename(filename, ynInput) {
-  if (ynInput === null || negation.has(ynInput)) return false;
-
+function initRename(filename) {
   log('>  \n');
+  
   process.stdin.on('readable', () => {
     sPut.rename(process.stdin.read(), err => null)
   })

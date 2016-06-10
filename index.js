@@ -79,7 +79,8 @@ exports.watch = (ext, destPath, opts) => {
         .then(exists => {
           if (!exists) return;
 
-          moveFile(origin, err => err ? cb(err) : ps.emit('moved', origin));
+          ps.emit('detect', origin);
+          moveFile(origin, err => err ? cb(err) : ps.emit('move', origin));
         })
     })
   }
@@ -94,6 +95,7 @@ exports.watch = (ext, destPath, opts) => {
 
     read.pipe(fs.createWriteStream(newPath));
     
+    // read.on('data', chunk => ps.emit('partial'));
     read.on('error', err => cb(err));
     read.on('end', () => {
       moved.push(filename);
