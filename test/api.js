@@ -28,7 +28,7 @@ test.cb('`watch` rejects non-existing `dest` path', t => {
   execFile('../cli.js', [ext, nonDest], (err, stdout, stderr) => {
     t.ifError(err);
     
-    t.is(stderr, `${nonDest} is not a valid directory\n`);
+    t.is(stderr, `> ${nonDest} is not a valid directory\n`);
     t.end();
   })
 })

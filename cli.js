@@ -35,7 +35,7 @@ sPut.ps.on('watch', src => {
   write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-sPut.ps.on('detect', promptRename);
+// sPut.ps.on('detect', promptRename);
 
 sPut.ps.on('partial', log);
 
@@ -57,7 +57,7 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
     process.exit(0);
   })
   .catch(err => {
-    process.stderr.write(`> ${err}\n`);
+    process.stderr.write(`> ${err}`);
   })
 
 function promptRename(file) {
