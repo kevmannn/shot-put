@@ -30,7 +30,7 @@ const negation = new Set(['\u001B', '\u007F']); // esc, delete
 const resolution = new Set(['\r', '\t', '\u0020']); // enter, tab, space
 
 const write = str => process.stdout.write(str);
-const restore = () => process.stdin.removeAllListeners('readable');
+const writeErr = err => process.stderr.write(`> ${err}`);
 
 sPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
@@ -46,28 +46,28 @@ sPut.ps.on('move', file => {
 })
 
 sPut.watch(cli.input[0], cli.input[1], cli.flags)
-  .then(info => {
-    const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${cli.input[0]}`);
+  .then(logResult)
+  .catch(writeErr)
 
-    if (process.env.FORK) {
-      process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
-    }
-    
-    write(`\n> moved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
+function logResult(info) {
+  const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${cli.input[0]}`);
 
-    info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
-    process.exit(0);
-  })
-  .catch(err => {
-    process.stderr.write(`> ${err}`);
-  })
+  if (process.env.FORK) {
+    process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
+  }
+  
+  write(`\n> moved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
+
+  info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
+  process.exit(0);
+}
 
 function promptRename(file) {
   log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')}\n`);
 
   setTimeout(() => {
     ansi.eraseLines(1);
-    restore();
+    process.stdin.removeAllListeners('readable');
   }, 10 * 1000);
 
   process.stdin.setRawMode(true);
