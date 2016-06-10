@@ -22,7 +22,7 @@ const restore = (t, dir) => {
 
 test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
 
-test.cb('`.watch()` rejects non-existing `dest` path', t => {
+test.cb('`watch` rejects non-existing `dest` path', t => {
   const nonDest = path.join(dest, 'z');
 
   execFile('../cli.js', [ext, nonDest], (err, stdout, stderr) => {
@@ -33,7 +33,7 @@ test.cb('`.watch()` rejects non-existing `dest` path', t => {
   })
 })
 
-test.skip('`.watch()` listens when given valid `dest` path', t => {
+test.skip('`watch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
@@ -53,9 +53,11 @@ test.cb('`info.moved` reflects number of files moved', t => {
 
 test.skip('`rename` intercepts transfer and renames file', t => {})
 
-test.skip('`rename` timesout after `n` ms and name is retained', t => {})
+test.skip('`rename` timesout after `n` ms and filename is retained', t => {})
 
-test.skip('`.watch()` transfers file from `source` to `dest`', t => {
+test.skip('`watch` ignores files with ext other than `ext`', t => {})
+
+test.skip('`watch` transfers file from `source` to `dest`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
 
   read.pipe(fs.createWriteStream(path.join(source, 'x.js')));

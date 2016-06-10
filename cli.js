@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 'use strict';
-const path = require('path');
 const meow = require('meow');
 const chalkForm = require('chalk-form');
 const log = require('single-line-log').stdout;
-const shotPut = require('./');
+const sPut = require('./');
 
 const cli = meow(`
   Usage:
@@ -28,17 +27,17 @@ const destStr = chalkForm(['green', 'bold'])(cli.input[1]);
 
 const write = str => process.stdout.write(str);
 
-shotPut.ps.on('watch', src => {
+sPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
   write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-shotPut.ps.on('moved', file => {
+sPut.ps.on('moved', file => {
   log(`..moved ${chalkForm(['italic', 'dim'])(file)}\n`);
   // promptRename(file);
 })
 
-shotPut.watch(cli.input[0], cli.input[1], cli.flags)
+sPut.watch(cli.input[0], cli.input[1], cli.flags)
   .then(info => {
     const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${cli.input[0]}`);
 
@@ -56,20 +55,20 @@ shotPut.watch(cli.input[0], cli.input[1], cli.flags)
   })
 
 function promptRename(file) {
-  write(`> rename ${file} (y/n) ?  `);
+  log(`> rename ${file} (y/n) ?\n`);
 
   process.stdin.setRawMode(true);
   process.stdin.on('readable', initRename.bind(null, file, process.stdin.read()));
 }
 
 function initRename(filename, ynInput) {
-  const negation = new Set(['\u0003']);
-  const resolution = new Set(['\r', '\t', 121, 89]);
+  const negation = new Set(['\u0003', 78]);
+  const resolution = new Set(['\r', '\t', 89]);
 
   if (ynInput === null || negation.indexOf(ynInput) !== -1) return false;
 
-  write('>\n');
+  log('>  \n');
   process.stdin.on('readable', () => {
-    shotPut.rename(process.stdin.read(), err => {})
+    sPut.rename(process.stdin.read(), err => {})
   })
 }
