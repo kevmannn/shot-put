@@ -23,7 +23,7 @@ const cli = meow(`
 })
 
 let sourceStr = '';
-const destStr = chalkForm(['green', 'bold'])(cli.input[1]);
+const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
 const write = str => process.stdout.write(str);
 
@@ -33,7 +33,7 @@ sPut.ps.on('watch', src => {
 })
 
 sPut.ps.on('moved', file => {
-  log(`  ..moved ${chalkForm(['italic', 'dim'])(file)}\n`);
+  log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
   // promptRename(file);
 })
 
@@ -45,7 +45,7 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
       process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
     }
     
-    write(`\n\nmoved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
+    write(`\n> moved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
 
     info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
     process.exit(0);
