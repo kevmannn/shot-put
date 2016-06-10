@@ -25,6 +25,9 @@ const cli = meow(`
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
+const negation = new Set(['\u001B', '\u007F', '\u006E', '\u004E']);
+const resolution = new Set(['\r', '\t', '\u0079', '\u0059', '\u0020']);
+
 const write = str => process.stdout.write(str);
 
 sPut.ps.on('watch', src => {
@@ -62,13 +65,10 @@ function promptRename(file) {
 }
 
 function initRename(filename, ynInput) {
-  const negation = new Set(['\u0003', 78]);
-  const resolution = new Set(['\r', '\t', 89]);
-
-  if (ynInput === null || negation.indexOf(ynInput) !== -1) return false;
+  if (ynInput === null || negation.has(ynInput)) return false;
 
   log('>  \n');
   process.stdin.on('readable', () => {
-    sPut.rename(process.stdin.read(), err => {})
+    sPut.rename(process.stdin.read(), err => null)
   })
 }
