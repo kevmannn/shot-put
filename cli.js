@@ -37,7 +37,7 @@ sPut.ps.on('watch', src => {
 
 // sPut.ps.on('detect', promptRename);
 
-sPut.ps.on('partial', log);
+// sPut.ps.on('partial', log);
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
@@ -61,7 +61,7 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
   })
 
 function promptRename(file) {
-  log(`> rename ${file}? (enter/esc)\n`);
+  log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')}\n`);
 
   // setTimeout(() => ps.emit('rename-timeout'), 10 * 1000)
 
@@ -79,6 +79,6 @@ function initRename(filename) {
   process.stdin.on('readable', () => {
     const userIn = process.stdin.read();
 
-    sPut.rename(userIn, err => {})
+    if (userIn === '\r') sPut.rename(userIn, err => {})
   })
 }
