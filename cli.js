@@ -35,9 +35,9 @@ sPut.ps.on('watch', src => {
   write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-sPut.ps.on('partial', log);
-
 sPut.ps.on('detect', promptRename);
+
+sPut.ps.on('partial', log);
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
@@ -57,7 +57,7 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
     process.exit(0);
   })
   .catch(err => {
-    process.stderr.write(err);
+    process.stderr.write(`> ${err}\n`);
   })
 
 function promptRename(file) {

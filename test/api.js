@@ -52,7 +52,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`rename` can intercept transfer and rename file', t => {})
+test.skip('`rename` intercepts transfer and renames file', t => {})
 
 test.skip('`rename` timesout after `n` ms and filename is retained', t => {})
 
