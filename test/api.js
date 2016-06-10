@@ -46,6 +46,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
+    t.true(Array.isArray(m.movedFiles));
     t.is(m.movedFiles.length, 0);
     t.end();
   })

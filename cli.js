@@ -29,11 +29,11 @@ const write = str => process.stdout.write(str);
 
 sPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
-  write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
+  write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
 sPut.ps.on('moved', file => {
-  log(`..moved ${chalkForm(['italic', 'dim'])(file)}\n`);
+  log(`  ..moved ${chalkForm(['italic', 'dim'])(file)}\n`);
   // promptRename(file);
 })
 
