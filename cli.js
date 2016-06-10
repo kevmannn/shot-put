@@ -25,8 +25,8 @@ const cli = meow(`
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
-const negation = new Set(['\u001B', '\u007F', '\u006E', '\u004E']);
-const resolution = new Set(['\r', '\t', '\u0079', '\u0059', '\u0020']);
+const negation = new Set(['\u001B', '\u007F']); // esc, delete
+const resolution = new Set(['\r', '\t', '\u0020']); // enter, tab, space
 
 const write = str => process.stdout.write(str);
 
@@ -35,13 +35,12 @@ sPut.ps.on('watch', src => {
   write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-// sPut.ps.on('partial', chunk => null);
+sPut.ps.on('partial', log);
 
-// sPut.ps.on('detect', promptRename);
+sPut.ps.on('detect', promptRename);
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
-  // promptRename(file);
 })
 
 sPut.watch(cli.input[0], cli.input[1], cli.flags)
@@ -62,13 +61,15 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
   })
 
 function promptRename(file) {
-  log(`> rename ${file}? (y/n)\n`);
+  log(`> rename ${file}? (enter/esc)\n`);
+
+  // setTimeout(() => ps.emit('rename-timeout'), 10 * 1000)
 
   process.stdin.setRawMode(true);
   process.stdin.on('readable', () => {
-    const yn = process.stdin.read();
+    const userIn = process.stdin.read();
 
-    if (!negation.has(yn) && yn !== null) initRename(file);
+    if (!negation.has(userIn) && userIn !== null) initRename(file);
   })
 }
 
@@ -76,6 +77,8 @@ function initRename(filename) {
   log('>  \n');
 
   process.stdin.on('readable', () => {
-    sPut.rename(process.stdin.read(), err => null)
+    const userIn = process.stdin.read();
+
+    sPut.rename(userIn, err => {})
   })
 }
