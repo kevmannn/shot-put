@@ -4,6 +4,7 @@ import { execFile, fork } from 'child_process';
 import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
+import { watch, rename } from '../';
 
 const ext = '.js';
 const source = path.resolve('..', 'output', 'x');
@@ -49,6 +50,10 @@ test.cb('`info.moved` reflects number of files moved', t => {
     t.end();
   })
 })
+
+test.skip('`rename` intercepts transfer and renames file', t => {})
+
+test.skip('`rename` timesout after `n` ms and name is retained', t => {})
 
 test.skip('`.watch()` transfers file from `source` to `dest`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
