@@ -63,7 +63,7 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
 function promptRename(file) {
   log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')}\n`);
 
-  // setTimeout(() => ps.emit('rename-timeout'), 10 * 1000)
+  // setTimeout(() => false, 10 * 1000)
 
   process.stdin.setRawMode(true);
   process.stdin.on('readable', () => {
