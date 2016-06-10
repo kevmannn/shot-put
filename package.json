@@ -41,6 +41,7 @@
     "unique-temp-dir": "^1.0.0"
   },
   "dependencies": {
+    "ansi-escapes": "^1.4.0",
     "async": "^2.0.0-rc.3",
     "chalk-form": "^0.1.2",
     "lodash": "^4.13.1",

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const meow = require('meow');
+const ansi = require('ansi-escapes');
 const chalkForm = require('chalk-form');
 const log = require('single-line-log').stdout;
 const sPut = require('./');
@@ -63,7 +64,7 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
 function promptRename(file) {
   log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')}\n`);
 
-  // setTimeout(() => false, 10 * 1000)
+  // setTimeout(() => ansi.eraseLines(1), 10 * 1000)
 
   process.stdin.setRawMode(true);
   process.stdin.on('readable', () => {
