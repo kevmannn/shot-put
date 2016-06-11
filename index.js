@@ -18,7 +18,7 @@ const parseHome = str => {
 
 exports.ps = ps;
 
-exports.rename = str => {}
+exports.rename = userIn => {}
 
 exports.watch = (ext, destPath, opts) => {
   opts = opts || {};
@@ -79,10 +79,9 @@ exports.watch = (ext, destPath, opts) => {
         .then(exists => {
           if (!exists) return;
 
-          // ps.emit('detect', origin);
-          moveFile(origin, err => {
-            if (err) return cb(err);
-            ps.emit('move', origin);
+          ps.emit('detect', origin);
+          ps.on('rename-timeout', () => {
+            moveFile(origin, err => err ? cb(err) : ps.emit('move', origin))
           })
         })
     })
