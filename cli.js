@@ -63,7 +63,11 @@ function logResult(info) {
 }
 
 function promptRename(file) {
-  log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')}\n`);
+  let i = 10;
+
+  setInterval(() => {
+    log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')} (${i--})\n`);
+  }, 1000)
 
   setTimeout(() => {
     ansi.eraseLines(1);
