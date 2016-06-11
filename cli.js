@@ -26,11 +26,16 @@ const cli = meow(`
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
-const negation = new Set(['\u001B', '\u007F']); // esc, delete
+const negation = new Set(['\u001B', '\u007F', '\u0003']); // esc, delete, eot
 const resolution = new Set(['\r', '\t', '\u0020']); // enter, tab, space
 
 const write = str => process.stdout.write(str);
 const writeErr = err => process.stderr.write(`> ${err}`);
+
+const restore = () => {
+  ansi.eraseLines(1);
+  process.stdin.removeAllListeners('readable');
+}
 
 sPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
@@ -39,7 +44,7 @@ sPut.ps.on('watch', src => {
 
 // sPut.ps.on('detect', promptRename);
 
-sPut.ps.on('partial', log);
+// sPut.ps.on('partial', log);
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
@@ -63,20 +68,18 @@ function logResult(info) {
 }
 
 function promptRename(file) {
-  log(`> rename ${chalkForm(['italic', 'dim'])(file)} ${chalkForm(['bold'])('? (enter/esc)')})\n`);
+  log(`> rename ${chalkForm(['italic', 'dim'])(file)} ${chalkForm(['bold'])('? (enter/esc)')}\n`);
 
-  const timer = setTimeout(() => {
-    ansi.eraseLines(1);
-    process.stdin.removeAllListeners('readable');
-  }, 10 * 1000);
+  const timer = setTimeout(() => restore(), 10 * 1000);
 
-  process.stdin.setRawMode(true);
   process.stdin.on('readable', () => {
     const userIn = process.stdin.read();
 
     if (!negation.has(userIn) && userIn !== null) {
       clearTimeout(timer);
       initRename(file);
+    } else if (negation.has(userIn)) {
+      restore();
     }
   })
 }

@@ -88,6 +88,8 @@ exports.watch = (ext, destPath, opts) => {
   function moveFile(filename, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
 
+    let n = 0;
+    const full = fs.statSync(oldPath).size;
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
 
@@ -96,7 +98,7 @@ exports.watch = (ext, destPath, opts) => {
     read.pipe(fs.createWriteStream(newPath));
     
     read.on('error', err => cb(err));
-    read.on('data', d => ps.emit('partial', Buffer.byteLength(d, 'utf8')));
+    read.on('data', d => ps.emit('partial', d.length));
     read.on('end', () => {
       moved.push(filename);
 
