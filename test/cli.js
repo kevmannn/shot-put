@@ -6,6 +6,8 @@ const env = Object.create(process.env);
 
 env.FORK = true;
 
+test.skip('`promptRename` timesout after `n` ms and filename is retained', t => {})
+
 test.cb('--preserve protects files from movement', t => {
   const sPut = fork('../cli.js', [ext, __dirname, '--preserve="i.js j.js"'], { env });
 

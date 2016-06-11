@@ -54,8 +54,6 @@ test.cb('`info.moved` reflects number of files moved', t => {
 
 test.skip('`rename` intercepts transfer and renames file', t => {})
 
-test.skip('`rename` timesout after `n` ms and filename is retained', t => {})
-
 test.skip('`watch` ignores files with ext other than `ext`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
 
