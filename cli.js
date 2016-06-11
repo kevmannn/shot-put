@@ -93,8 +93,6 @@ function initRename(filename) {
   process.stdin.on('readable', () => {
     const userIn = process.stdin.read();
 
-    if (resolution.has(userIn)) {
-      sPut.rename(userIn.toString(), err => err ? writeErr(err) : restore());
-    }
+    if (resolution.has(userIn)) sPut.ps.emit('rename-init', userIn.toString());
   })
 }

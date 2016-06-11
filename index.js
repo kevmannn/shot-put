@@ -18,8 +18,6 @@ const parseHome = str => {
 
 exports.ps = ps;
 
-exports.rename = userIn => {}
-
 exports.watch = (ext, destPath, opts) => {
   opts = opts || {};
 
@@ -75,23 +73,25 @@ exports.watch = (ext, destPath, opts) => {
     fs.watch(source, (e, origin) => {
       if (!(e === 'rename' && path.extname(origin) === ext)) return;
 
+      const emitMove = err => err ? cb(err) : ps.emit('move', origin);
+
       pathExists(path.join(source, origin))
         .then(exists => {
           if (!exists) return;
 
           ps.emit('detect', origin);
-          ps.on('rename-timeout', () => {
-            moveFile(origin, err => err ? cb(err) : ps.emit('move', origin))
-          })
+          ps.on('rename-timeout', () => moveFile(origin, emitMove));
+          ps.on('rename-init', rename => moveFile(origin, { rename }, emitMove));
         })
     })
   }
 
-  function moveFile(filename, cb) {
+  function moveFile(filename, opts, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
+    if (typeof opts === 'function') cb = opts;
 
     const oldPath = path.join(source, filename);
-    const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
+    const newPath = path.join(destPath, opts.rename || filename.replace(/\s/g, '_'));
 
     let n = 0;
     const full = fs.statSync(oldPath).size;
