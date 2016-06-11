@@ -42,9 +42,9 @@ sPut.ps.on('watch', src => {
   write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-// sPut.ps.on('detect', promptRename);
+sPut.ps.on('detect', promptRename);
 
-// sPut.ps.on('partial', log);
+sPut.ps.on('partial', log);
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
@@ -68,7 +68,7 @@ function logResult(info) {
 }
 
 function promptRename(file) {
-  log(`> rename ${chalkForm(['italic', 'dim'])(file)} ${chalkForm(['bold'])('? (enter/esc)')}\n`);
+  log(`${chalkForm(['italic', 'dim'])('> rename ' + file)} ${chalkForm(['bold'])('? (enter/esc)')}\n`);
 
   const timer = setTimeout(() => {
     sPut.ps.emit('rename-timeout');
