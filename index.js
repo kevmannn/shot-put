@@ -88,21 +88,28 @@ exports.watch = (ext, destPath, opts) => {
   function moveFile(filename, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
 
-    let n = 0;
-    const full = fs.statSync(oldPath).size;
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
 
+    let n = 0;
+    const full = fs.statSync(oldPath).size;
     const read = fs.createReadStream(oldPath);
 
     read.pipe(fs.createWriteStream(newPath));
     
-    read.on('error', err => cb(err));
-    read.on('data', d => ps.emit('partial', d.length));
-    read.on('end', () => {
+    read.on('error', cb);
+    read.on('data', emitPartial);
+    read.on('end', unlinkOldPath);
+
+    function emitPartial(data) {
+      n += data.length;
+      ps.emit('partial', Math.floor(n / full));
+    }
+
+    function unlinkOldPath() {
       moved.push(filename);
 
       process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
-    })
+    }
   }
 }
