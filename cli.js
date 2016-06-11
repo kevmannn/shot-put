@@ -39,7 +39,7 @@ sPut.ps.on('watch', src => {
 
 // sPut.ps.on('detect', promptRename);
 
-// sPut.ps.on('partial', log);
+sPut.ps.on('partial', log);
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
@@ -63,13 +63,9 @@ function logResult(info) {
 }
 
 function promptRename(file) {
-  let i = 10;
+  log(`> rename ${chalkForm(['italic', 'dim'])(file)} ${chalkForm(['bold'])('? (enter/esc)')})\n`);
 
-  setInterval(() => {
-    log(`> rename ${chalkForm(['italic', 'dim'])(file)} ? ${chalkForm(['bold'])('(enter/esc)')} (${i--})\n`);
-  }, 1000)
-
-  setTimeout(() => {
+  const timer = setTimeout(() => {
     ansi.eraseLines(1);
     process.stdin.removeAllListeners('readable');
   }, 10 * 1000);
@@ -78,7 +74,10 @@ function promptRename(file) {
   process.stdin.on('readable', () => {
     const userIn = process.stdin.read();
 
-    if (!negation.has(userIn) && userIn !== null) initRename(file);
+    if (!negation.has(userIn) && userIn !== null) {
+      clearTimeout(timer);
+      initRename(file);
+    }
   })
 }
 

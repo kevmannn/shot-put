@@ -96,7 +96,7 @@ exports.watch = (ext, destPath, opts) => {
     read.pipe(fs.createWriteStream(newPath));
     
     read.on('error', err => cb(err));
-    // read.on('data', d => ps.emit('partial', Buffer.byteLength(d, 'utf8')));
+    read.on('data', d => ps.emit('partial', Buffer.byteLength(d, 'utf8')));
     read.on('end', () => {
       moved.push(filename);
 
