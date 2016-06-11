@@ -56,14 +56,21 @@ test.skip('`rename` intercepts transfer and renames file', t => {})
 
 test.skip('`rename` timesout after `n` ms and filename is retained', t => {})
 
-test.skip('`watch` ignores files with ext other than `ext`', t => {})
+test.skip('`watch` ignores files with ext other than `ext`', t => {
+  // const read = fs.createReadStream(path.resolve('..', 'index.js'));
+
+  // read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
+
+  // read.on('error', t.ifError);
+  // read.on('end', sPut);
+})
 
 test.skip('`watch` transfers file from `source` to `dest`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
 
   read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
 
-  read.on('error', err => t.ifError(err));
+  read.on('error', t.ifError);
   read.on('end', sPut);
 
   function sPut() {
