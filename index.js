@@ -80,8 +80,8 @@ exports.watch = (ext, destPath, opts) => {
           if (!exists) return;
 
           ps.emit('detect', origin);
-          ps.on('rename-timeout', () => moveFile(origin, emitMove));
-          ps.on('rename-init', rename => moveFile(origin, { rename }, emitMove));
+          ps.once('rename-timeout', () => moveFile(origin, emitMove));
+          ps.once('rename-init', rename => moveFile(origin, { rename }, emitMove));
         })
     })
   }
@@ -105,7 +105,7 @@ exports.watch = (ext, destPath, opts) => {
 
     function emitPartial(data) {
       n += data.length;
-      ps.emit('partial', Math.floor(n / full));
+      ps.emit('partial', `% ${Math.floor((n / full) / 1e6)}`);
     }
 
     function unlinkOldPath() {
