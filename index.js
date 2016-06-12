@@ -89,16 +89,17 @@ exports.watch = (ext, destPath, opts) => {
 
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
-
     const read = fs.createReadStream(oldPath);
 
     read.pipe(fs.createWriteStream(newPath));
-    
-    read.on('error', err => cb(err));
-    read.on('end', () => {
+
+    read.on('error', cb);
+    read.on('end', unlinkOldPath);
+
+    function unlinkOldPath() {
       moved.push(filename);
 
       process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
-    })
+    }
   }
 }
