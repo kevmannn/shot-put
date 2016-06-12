@@ -31,6 +31,7 @@ let sourceStr = '';
 const destStr = chalkForm(['green', 'bold'])(input[1]);
 
 const write = str => process.stdout.write(str);
+const writeErr = err => process.stderr.write(err);
 
 shotPut.ps.on('watch', src => {
   sourceStr = chalkForm(['dim'])(src);
@@ -42,18 +43,18 @@ shotPut.ps.on('moved', file => {
 })
 
 shotPut.watch(input[0], input[1], flags)
-  .then(info => {
-    const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
+  .then(logResult)
+  .catch(writeErr)
 
-    if (process.env.FORK) {
-      process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
-    }
-    
-    write(`\n\nmoved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
+function logResult(info) {
+  const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
 
-    info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
-    process.exit(0);
-  })
-  .catch(err => {
-    process.stderr.write(chalkForm(['red', 'bold'])(err));
-  })
+  if (process.env.FORK) {
+    process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
+  }
+  
+  write(`\n\nmoved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
+
+  info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
+  process.exit(0);
+}
