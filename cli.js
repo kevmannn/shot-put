@@ -26,7 +26,7 @@ const cli = meow(`
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
-const negation = new Set(['\u001B', '\u007F']); // esc, delete
+const negation = new Set(['\u001B', '\x08', '\x7f', '\u007F']); // esc, delete
 const resolution = new Set(['\r', '\t']); // enter, tab
 
 const write = str => process.stdout.write(str);
