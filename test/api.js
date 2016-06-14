@@ -23,13 +23,23 @@ const restore = (t, dir) => {
 test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
 
 test('`.watch` rejects non-existing `dest` path', async t => {
-  let result;
   const p = path.join(dest, 'z');
 
   try {
-    result = await watch(ext, p, {});
+    const result = await watch(ext, p, {});
   } catch (err) {
     t.is(err, `${p} is not a valid directory\n`);
+  }
+})
+
+test('`.watch` rejects desktop given as `dest` path', async t => {
+  const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+  const dest = path.join(home, 'desktop');
+
+  try {
+    const result = await watch(ext, dest);
+  } catch (err) {
+    t.is(err, `must target a directory other than ${dest}\n`);
   }
 })
 
