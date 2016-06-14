@@ -10,7 +10,7 @@ const pathExists = require('path-exists');
 const ps = new EventEmitter();
 
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-let source = path.join(home, 'desktop');
+let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
 
 const parseHome = str => {
   return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
