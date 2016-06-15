@@ -32,11 +32,11 @@ test('`.watch` rejects non-existing `dest` path', async t => {
   }
 })
 
-test.skip('`.watch` listens when given valid `dest` path', t => {
+test.cb('`.watch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
-    t.truthy(m.src);
+    t.truthy(m.movedFiles);
     t.end();
   })
 })
