@@ -32,17 +32,6 @@ test('`.watch` rejects non-existing `dest` path', async t => {
   }
 })
 
-test('`.watch` rejects desktop given as `dest` path', async t => {
-  const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-  const desk = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
-
-  try {
-    const result = await watch(ext, desk);
-  } catch (err) {
-    t.is(err, `must target a directory other than ${desk}\n`);
-  }
-})
-
 test.skip('`.watch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 

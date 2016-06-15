@@ -36,7 +36,7 @@ const writeErr = err => process.stderr.write(`> ${err}`);
 const restore = () => {
   ansi.eraseLines(1);
   process.stdin.pause();
-  process.stdin.removeAllListeners('readable');
+  // process.stdin.removeAllListeners('readable');
 }
 
 sPut.ps.on('watch', src => {

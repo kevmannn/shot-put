@@ -19,15 +19,15 @@ const parseHome = str => {
 exports.ps = ps;
 
 exports.watch = (ext, destPath, opts) => {
-  opts = opts || {};
-
   if (!_.every([ext, destPath], x => typeof x === 'string')) {
     throw new TypeError(`expected strings as first two args`);
   }
 
+  opts = opts || {};
+  destPath = parseHome(untildify(destPath));
+
   let moved = [];
   let preserved = [];
-  destPath = parseHome(untildify(destPath));
 
   if (process.env.FORK) {
     source = path.join(__dirname, 'output', 'x');
