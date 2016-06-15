@@ -81,22 +81,21 @@ exports.watch = (ext, destPath, opts) => {
 
           ps.emit('detect', origin);
           ps.on('rename-timeout', () => moveFile(origin, emitMove));
-          ps.on('rename-init', rename => moveFile(origin, { rename }, emitMove));
+          ps.on('rename-init', renamed => moveFile(origin, { renamed }, emitMove));
         })
     })
   }
 
   function moveFile(filename, opts, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
-    if (typeof opts === 'function') cb = opts;
+    if (_.isFunction(opts)) cb = opts;
 
     const oldPath = path.join(source, filename);
-    const newPath = path.join(destPath, opts.rename || filename.replace(/\s/g, '_'));
-
-    let n = 0;
+    const newPath = path.join(destPath, !_.isFunction(opts) ? opts.renamed : filename.replace(/\s/g, '_'));
     const full = fs.statSync(oldPath).size;
-    const read = fs.createReadStream(oldPath);
+    let n = 0;
 
+    const read = fs.createReadStream(oldPath);
     read.pipe(fs.createWriteStream(newPath));
     
     read.on('error', cb);
@@ -110,7 +109,6 @@ exports.watch = (ext, destPath, opts) => {
 
     function unlinkOldPath() {
       moved.push(filename);
-
       process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
     }
   }
