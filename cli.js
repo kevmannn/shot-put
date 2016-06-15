@@ -27,7 +27,7 @@ let timer = null;
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
-const negation = new Set(['\u001B', '\x08', '\x7f', '\u007F']); // esc, delete
+const negation = new Set(['\u001B', '\x08', '\x7f', '\u007F']); // esc..., delete
 const resolution = new Set(['\r', '\t']); // enter, tab
 
 const write = str => process.stdout.write(str);
@@ -36,7 +36,7 @@ const writeErr = err => process.stderr.write(`> ${err}`);
 const restore = () => {
   ansi.eraseLines(1);
   process.stdin.pause();
-  // process.stdin.removeAllListeners('readable');
+  process.stdin.removeAllListeners('readable');
 }
 
 sPut.ps.on('watch', src => {

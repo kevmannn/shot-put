@@ -80,8 +80,8 @@ exports.watch = (ext, destPath, opts) => {
           if (!exists) return;
 
           ps.emit('detect', origin);
-          ps.once('rename-timeout', () => moveFile(origin, emitMove));
-          ps.once('rename-init', rename => moveFile(origin, { rename }, emitMove));
+          ps.on('rename-timeout', () => moveFile(origin, emitMove));
+          ps.on('rename-init', rename => moveFile(origin, { rename }, emitMove));
         })
     })
   }
