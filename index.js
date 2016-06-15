@@ -70,19 +70,19 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   function watch(cb) {
-    fs.watch(source, (e, origin) => {
-      if (!(e === 'rename' && path.extname(origin) === ext)) return;
+    fs.watch(source, (e, filename) => {
+      if (!(e === 'rename' && path.extname(filename) === ext)) return;
 
-      const emitMove = err => err ? cb(err) : ps.emit('move', origin);
+      const emitMove = err => err ? cb(err) : ps.emit('move', filename);
 
-      ps.on('rename-timeout', () => moveFile(origin, emitMove));
-      ps.on('rename-init', renamed => moveFile(origin, { renamed }, emitMove));
+      ps.on('rename-timeout', () => moveFile(filename, emitMove));
+      ps.on('rename-init', renamed => moveFile(filename, { renamed }, emitMove));
 
-      pathExists(path.join(source, origin))
+      pathExists(path.join(source, filename))
         .then(exists => {
           if (!exists) return;
 
-          process.nextTick(() => ps.emit('detect', origin));
+          process.nextTick(() => ps.emit('detect', filename));
         })
     })
   }
