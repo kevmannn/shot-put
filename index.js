@@ -80,9 +80,9 @@ exports.watch = (ext, destPath, opts) => {
 
       pathExists(path.join(source, filename))
         .then(exists => {
-          if (!exists) return;
+          if (!exists) return cb(new Error(`${filename} does not exist`));
 
-          process.nextTick(() => ps.emit('detect', filename));
+          ps.emit('detect', filename)
         })
     })
   }
@@ -93,12 +93,13 @@ exports.watch = (ext, destPath, opts) => {
 
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, !_.isFunction(opts) ? opts.renamed : filename.replace(/\s/g, '_'));
-    const full = fs.statSync(oldPath).size;
+    
     let n = 0;
+    const full = fs.statSync(oldPath).size;
 
     const read = fs.createReadStream(oldPath);
-    read.pipe(fs.createWriteStream(newPath));
 
+    read.pipe(fs.createWriteStream(newPath));
     read.on('error', cb);
     read.on('data', emitPartial);
     read.on('end', unlinkOldPath);
