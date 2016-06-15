@@ -75,10 +75,12 @@ function promptRename(file) {
   timer = setTimeout(() => {
     restore();
     sPut.ps.emit('rename-timeout');
-  }, 4 * 1000)
+  }, 5 * 1000)
 
   process.stdin.on('readable', () => {
-    const userIn = process.stdin.read();
+    if (process.stdin.read() === null) return;
+
+    const userIn = process.stdin.read().toString();
 
     if (resolution.has(userIn)) {
       clearTimeout(timer);
@@ -93,10 +95,12 @@ function initRename(filename) {
   log('>  \n');
 
   process.stdin.on('readable', () => {
-    const userIn = process.stdin.read();
+    if (process.stdin.read() === null) return;
+    
+    const userIn = process.stdin.read().toString();
 
-    if (resolution.has(userIn) && /[^A-z0-9-+_.@]/.test(userIn.toString())) {
-      sPut.ps.emit('rename-init', userIn.toString());
+    if (resolution.has(userIn) && /[^A-z0-9-+_.@]/.test(userIn)) {
+      sPut.ps.emit('rename-init', userIn);
     }
   })
 }
