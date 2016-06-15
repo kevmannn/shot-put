@@ -4,6 +4,7 @@ import { execFile, fork } from 'child_process';
 import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
+import pify from 'pify';
 import { watch } from '../';
 
 const ext = '.js';
@@ -13,11 +14,13 @@ const env = Object.create(process.env);
 
 env.FORK = true;
 
-const restore = (t, dir) => {
-  rimraf(dir, err => {
+const restore = async (t, dir) => {
+  try {
+    await pify(rimraf)(dir);
+    mkdirp(dir);
+  } catch (err) {
     t.ifError(err);
-    mkdirp(dir, err => t.ifError(err));
-  })
+  }
 }
 
 test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));

@@ -75,13 +75,14 @@ exports.watch = (ext, destPath, opts) => {
 
       const emitMove = err => err ? cb(err) : ps.emit('move', origin);
 
+      ps.on('rename-timeout', () => moveFile(origin, emitMove));
+      ps.on('rename-init', renamed => moveFile(origin, { renamed }, emitMove));
+
       pathExists(path.join(source, origin))
         .then(exists => {
           if (!exists) return;
 
-          ps.emit('detect', origin);
-          ps.on('rename-timeout', () => moveFile(origin, emitMove));
-          ps.on('rename-init', renamed => moveFile(origin, { renamed }, emitMove));
+          process.nextTick(() => ps.emit('detect', origin));
         })
     })
   }
@@ -97,7 +98,7 @@ exports.watch = (ext, destPath, opts) => {
 
     const read = fs.createReadStream(oldPath);
     read.pipe(fs.createWriteStream(newPath));
-    
+
     read.on('error', cb);
     read.on('data', emitPartial);
     read.on('end', unlinkOldPath);
