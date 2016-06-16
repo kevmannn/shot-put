@@ -49,6 +49,7 @@
     "mkdirp": "^0.5.1",
     "path-exists": "^2.1.0",
     "pify": "^2.3.0",
+    "pretty-bytes": "^3.0.1",
     "rimraf": "^2.5.2",
     "single-line-log": "^1.1.1",
     "untildify": "^2.1.0"

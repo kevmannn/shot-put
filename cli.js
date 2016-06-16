@@ -3,6 +3,7 @@
 const meow = require('meow');
 const ansi = require('ansi-escapes');
 const chalkForm = require('chalk-form');
+const prettyBytes = require('pretty-bytes');
 const log = require('single-line-log').stdout;
 const sPut = require('./');
 
@@ -46,7 +47,7 @@ sPut.ps.on('watch', src => {
 
 sPut.ps.on('detect', promptRename);
 
-sPut.ps.on('partial', log);
+sPut.ps.on('partial', str => log(prettyBytes(str)));
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
