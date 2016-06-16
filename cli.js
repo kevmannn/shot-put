@@ -24,7 +24,6 @@ const cli = meow(`
   }
 })
 
-let timer = null;
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
@@ -36,7 +35,6 @@ const writeErr = err => process.stderr.write(`> ${err}`);
 
 const restore = () => {
   ansi.eraseLines(1);
-  process.stdin.pause();
   process.stdin.removeAllListeners('readable');
 }
 
@@ -71,12 +69,16 @@ function logResult(info) {
 }
 
 function promptRename(file) {
-  log(`${chalkForm(['italic', 'dim'])('> rename ' + file)} ${chalkForm(['bold'])('? (enter/esc)')}\n`);
+  let i = 3;
 
-  timer = setTimeout(() => {
+  const iv = setInterval(() => {
+    log(`${chalkForm(['italic', 'dim'])(`> rename ${file} ? (enter/esc) ${i--}`)}\n`);
+  }, 1000)
+
+  const ti = setTimeout(() => {
     restore();
     sPut.ps.emit('rename-timeout');
-  }, 5 * 1000)
+  }, 3 * 1000)
 
   process.stdin.on('readable', () => {
     if (process.stdin.read() === null) return;
@@ -84,7 +86,8 @@ function promptRename(file) {
     const userIn = process.stdin.read().toString();
 
     if (resolution.has(userIn)) {
-      clearTimeout(timer);
+      clearTimeout(ti);
+      // clearInterval(iv);
       initRename(file);
     } else if (negation.has(userIn)) {
       restore();

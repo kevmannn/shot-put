@@ -97,11 +97,11 @@ exports.watch = (ext, destPath, opts) => {
 
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, !_.isFunction(opts) ? opts.renamed : filename.replace(/\s/g, '_'));
-
     const size = { partial: 0, total: fs.statSync(oldPath).size }
     const read = fs.createReadStream(oldPath);
 
     read.pipe(fs.createWriteStream(newPath));
+
     read.on('error', cb);
     read.on('data', emitPartial);
     read.on('end', unlinkOldPath);

@@ -54,16 +54,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with ext other than `ext`', t => {
-  const read = fs.createReadStream(path.resolve('..', 'index.js'));
-
-  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
-
-  read.on('error', t.ifError);
-  read.on('end', sPut);
-
-  function sPut() {}
-})
+test.skip('`.watch` ignores files with ext other than `ext`', async t => {})
 
 test.skip('`.watch` transfers file from `source` to `dest`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
