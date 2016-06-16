@@ -8,7 +8,6 @@ const untildify = require('untildify');
 const pathExists = require('path-exists');
 
 const ps = new EventEmitter();
-
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
 
@@ -18,18 +17,16 @@ const parseHome = str => {
 
 exports.ps = ps;
 
-exports.rename = str => {}
-
 exports.watch = (ext, destPath, opts) => {
-  opts = opts || {};
-
   if (!_.every([ext, destPath], x => typeof x === 'string')) {
     throw new TypeError(`expected strings as first two args`);
   }
 
+  opts = opts || {};
+  destPath = parseHome(untildify(destPath));
+
   let moved = [];
   let preserved = [];
-  destPath = parseHome(untildify(destPath));
 
   if (process.env.FORK) {
     source = path.join(__dirname, 'output', 'x');
@@ -46,41 +43,40 @@ exports.watch = (ext, destPath, opts) => {
     process.on('SIGINT', () => resolve({ moved, preserved }));
 
     pathExists(destPath)
-      .then(exists => {
-        if (!exists) return reject(`${destPath} is not a valid directory\n`);
-        if (destPath === source) return reject(`must target a directory other than ${source}\n`);
+      .then(beginWatch)
+      .catch(reject)
 
-        ps.emit('watch', source);
+    function beginWatch(validPath) {
+      if (!validPath) return reject(`${destPath} is not a valid directory\n`);
+      if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
-        async.series([
-          moveExisting,
-          watch
-        ], err => err ? reject(err) : true)
-      })
+      ps.emit('begin-watch', source);
+
+      async.series([
+        moveExisting,
+        watch
+      ], err => err ? reject(err) : null)
+    }
   })
 
   function moveExisting(cb) {
     fs.readdir(source, (err, files) => {
       if (err) return cb(err);
 
-      files
-        .filter(f => path.extname(f) === ext)
-        .forEach(f => moveFile(f, err => err ? cb(err) : null))
-
-      cb(null);
+      const ofExt = files.filter(f => path.extname(f) === ext);
+      async.each(ofExt, moveFile, err => cb(err || null));
     })
   }
 
   function watch(cb) {
-    fs.watch(source, (e, origin) => {
-      if (!(e === 'rename' && path.extname(origin) === ext)) return;
+    fs.watch(source, (e, filename) => {
+      if (!(e === 'rename' && path.extname(filename) === ext)) return;
 
-      pathExists(path.join(source, origin))
-        .then(exists => {
-          if (!exists) return;
+      const emitMove = err => err ? cb(err) : ps.emit('move', filename);
 
-          moveFile(origin, err => err ? cb(err) : ps.emit('moved', origin));
-        })
+      pathExists(path.join(source, filename))
+        .then(exists => exists ? moveFile(filename, emitMove) : null)
+        .catch(cb)
     })
   }
 
@@ -94,12 +90,9 @@ exports.watch = (ext, destPath, opts) => {
     read.pipe(fs.createWriteStream(newPath));
 
     read.on('error', cb);
-    read.on('end', unlinkOldPath);
-
-    function unlinkOldPath() {
+    read.on('end', () => {
       moved.push(filename);
-
       process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
-    }
+    })
   }
 }

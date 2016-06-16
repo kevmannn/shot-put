@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 'use strict';
-
-const path = require('path');
 const meow = require('meow');
+const ansi = require('ansi-escapes');
 const chalkForm = require('chalk-form');
 const log = require('single-line-log').stdout;
-const shotPut = require('./');
+const sPut = require('./');
 
 const cli = meow(`
   Usage:
-    $ shot-put <ext dir> Watch desktop for 'ext' files and move them to 'dir'
+    $ shot-put <ext dir> Watch /desktop for 'ext' files and move them to 'dir'
 
   Options:
     --preserve="<filenames>" Prevent specific files from ever being moved
@@ -24,36 +23,33 @@ const cli = meow(`
   }
 })
 
-const input = cli.input;
-const flags = cli.flags;
-
 let sourceStr = '';
-const destStr = chalkForm(['green', 'bold'])(input[1]);
+const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
 const write = str => process.stdout.write(str);
-const writeErr = err => process.stderr.write(err);
+const writeErr = err => process.stderr.write(`> ${err}`);
 
-shotPut.ps.on('watch', src => {
+sPut.ps.on('begin-watch', src => {
   sourceStr = chalkForm(['dim'])(src);
-  write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(input[0])} files..\n`);
+  write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
 
-shotPut.ps.on('moved', file => {
-  log(`..moved ${chalkForm(['italic', 'dim'])(file)}\n`);
+sPut.ps.on('move', file => {
+  log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
 })
 
-shotPut.watch(input[0], input[1], flags)
+sPut.watch(cli.input[0], cli.input[1], cli.flags)
   .then(logResult)
   .catch(writeErr)
 
 function logResult(info) {
-  const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${input[0]}`);
+  const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${cli.input[0]}`);
 
   if (process.env.FORK) {
     process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
   }
-  
-  write(`\n\nmoved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
+
+  write(`\n> moved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
 
   info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
   process.exit(0);

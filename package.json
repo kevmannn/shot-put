@@ -41,12 +41,14 @@
     "unique-temp-dir": "^1.0.0"
   },
   "dependencies": {
+    "ansi-escapes": "^1.4.0",
     "async": "^2.0.0-rc.3",
     "chalk-form": "^0.1.2",
     "lodash": "^4.13.1",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
     "path-exists": "^2.1.0",
+    "pify": "^2.3.0",
     "rimraf": "^2.5.2",
     "single-line-log": "^1.1.1",
     "untildify": "^2.1.0"
