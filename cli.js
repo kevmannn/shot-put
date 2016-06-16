@@ -3,7 +3,6 @@
 const meow = require('meow');
 const ansi = require('ansi-escapes');
 const chalkForm = require('chalk-form');
-const prettyBytes = require('pretty-bytes');
 const log = require('single-line-log').stdout;
 const sPut = require('./');
 
@@ -27,25 +26,13 @@ const cli = meow(`
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
-const negation = new Set(['\u001B', '\x08', '\x7f', '\u007F']); // esc..., delete
-const resolution = new Set(['\r', '\t']); // enter, tab
-
 const write = str => process.stdout.write(str);
 const writeErr = err => process.stderr.write(`> ${err}`);
 
-const restore = () => {
-  ansi.eraseLines(1);
-  process.stdin.removeAllListeners('readable');
-}
-
-sPut.ps.on('watch', src => {
+sPut.ps.on('begin-watch', src => {
   sourceStr = chalkForm(['dim'])(src);
   write(`\n> watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..\n`);
 })
-
-sPut.ps.on('detect', promptRename);
-
-sPut.ps.on('partial', str => log(prettyBytes(str)));
 
 sPut.ps.on('move', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
@@ -66,45 +53,4 @@ function logResult(info) {
 
   info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
   process.exit(0);
-}
-
-function promptRename(file) {
-  let i = 3;
-
-  const iv = setInterval(() => {
-    log(`${chalkForm(['italic', 'dim'])(`> rename ${file} ? (enter/esc) ${i--}`)}\n`);
-  }, 1000)
-
-  const ti = setTimeout(() => {
-    restore();
-    sPut.ps.emit('rename-timeout');
-  }, 3 * 1000)
-
-  process.stdin.on('readable', () => {
-    if (process.stdin.read() === null) return;
-
-    const userIn = process.stdin.read().toString();
-
-    if (resolution.has(userIn)) {
-      clearTimeout(ti);
-      // clearInterval(iv);
-      initRename(file);
-    } else if (negation.has(userIn)) {
-      restore();
-    }
-  })
-}
-
-function initRename(filename) {
-  log('>  \n');
-
-  process.stdin.on('readable', () => {
-    if (process.stdin.read() === null) return;
-    
-    const userIn = process.stdin.read().toString();
-
-    if (resolution.has(userIn) && /[^A-z0-9-+_.@]/.test(userIn)) {
-      sPut.ps.emit('rename-init', userIn);
-    }
-  })
 }

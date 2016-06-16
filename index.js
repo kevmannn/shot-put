@@ -8,7 +8,6 @@ const untildify = require('untildify');
 const pathExists = require('path-exists');
 
 const ps = new EventEmitter();
-
 const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
 let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
 
@@ -51,12 +50,12 @@ exports.watch = (ext, destPath, opts) => {
       if (!validPath) return reject(`${destPath} is not a valid directory\n`);
       if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
-      ps.emit('watch', source);
+      ps.emit('begin-watch', source);
 
       async.series([
         moveExisting,
         watch
-      ], err => err ? reject(err) : true)
+      ], err => err ? reject(err) : null)
     }
   })
 
@@ -64,11 +63,8 @@ exports.watch = (ext, destPath, opts) => {
     fs.readdir(source, (err, files) => {
       if (err) return cb(err);
 
-      files
-        .filter(f => path.extname(f) === ext)
-        .forEach(f => moveFile(f, err => err ? cb(err) : null))
-
-      cb(null);
+      const ofExt = files.filter(f => path.extname(f) === ext);
+      async.each(ofExt, moveFile, err => cb(err || null));
     })
   }
 
@@ -78,42 +74,26 @@ exports.watch = (ext, destPath, opts) => {
 
       const emitMove = err => err ? cb(err) : ps.emit('move', filename);
 
-      ps.on('rename-timeout', () => moveFile(filename, emitMove));
-      ps.on('rename-init', renamed => moveFile(filename, { renamed }, emitMove));
-
       pathExists(path.join(source, filename))
-        .then(exists => {
-          if (!exists) return;
-
-          ps.emit('detect', filename);
-        })
+        .then(exists => exists ? moveFile(filename, emitMove) : null)
         .catch(cb)
     })
   }
 
-  function moveFile(filename, opts, cb) {
+  function moveFile(filename, cb) {
     if (preserved.indexOf(filename) !== -1) return null;
-    if (_.isFunction(opts)) cb = opts;
 
     const oldPath = path.join(source, filename);
-    const newPath = path.join(destPath, !_.isFunction(opts) ? opts.renamed : filename.replace(/\s/g, '_'));
-    const size = { partial: 0, total: fs.statSync(oldPath).size }
+    const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
+
     const read = fs.createReadStream(oldPath);
 
     read.pipe(fs.createWriteStream(newPath));
 
     read.on('error', cb);
-    read.on('data', emitPartial);
-    read.on('end', unlinkOldPath);
-
-    function emitPartial(data) {
-      size.partial += data.length;
-      ps.emit('partial', Math.floor(size.partial / size.total));
-    }
-
-    function unlinkOldPath() {
+    read.on('end', () => {
       moved.push(filename);
       process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
-    }
+    })
   }
 }
