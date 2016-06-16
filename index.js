@@ -44,17 +44,20 @@ exports.watch = (ext, destPath, opts) => {
     process.on('SIGINT', () => resolve({ moved, preserved }));
 
     pathExists(destPath)
-      .then(exists => {
-        if (!exists) return reject(`${destPath} is not a valid directory\n`);
-        if (destPath === source) return reject(`must target a directory other than ${source}\n`);
+      .then(beginWatch)
+      .catch(reject)
 
-        ps.emit('watch', source);
+    function beginWatch(validPath) {
+      if (!validPath) return reject(`${destPath} is not a valid directory\n`);
+      if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
-        async.series([
-          moveExisting,
-          watch
-        ], err => err ? reject(err) : true)
-      })
+      ps.emit('watch', source);
+
+      async.series([
+        moveExisting,
+        watch
+      ], err => err ? reject(err) : true)
+    }
   })
 
   function moveExisting(cb) {
@@ -75,15 +78,9 @@ exports.watch = (ext, destPath, opts) => {
 
       const emitMove = err => err ? cb(err) : ps.emit('move', filename);
 
+      ps.emit('detect', filename);
       ps.on('rename-timeout', () => moveFile(filename, emitMove));
       ps.on('rename-init', renamed => moveFile(filename, { renamed }, emitMove));
-
-      pathExists(path.join(source, filename))
-        .then(exists => {
-          if (!exists) return cb(new Error(`${filename} does not exist`));
-
-          ps.emit('detect', filename)
-        })
     })
   }
 
@@ -93,10 +90,8 @@ exports.watch = (ext, destPath, opts) => {
 
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, !_.isFunction(opts) ? opts.renamed : filename.replace(/\s/g, '_'));
-    
-    let n = 0;
-    const full = fs.statSync(oldPath).size;
 
+    const size = { partial: 0, total: fs.statSync(oldPath.size) }
     const read = fs.createReadStream(oldPath);
 
     read.pipe(fs.createWriteStream(newPath));
@@ -105,8 +100,8 @@ exports.watch = (ext, destPath, opts) => {
     read.on('end', unlinkOldPath);
 
     function emitPartial(data) {
-      n += data.length;
-      ps.emit('partial', `% ${Math.floor((n / full) / 1e6)}`);
+      size.partial += data.length;
+      ps.emit('partial', `% ${Math.floor((size.partial / size.total) / 1e6)}`);
     }
 
     function unlinkOldPath() {
