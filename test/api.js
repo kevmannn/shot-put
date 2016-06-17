@@ -4,7 +4,6 @@ import { execFile, fork } from 'child_process';
 import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
-// import through from 'through';
 import pify from 'pify';
 import { watch } from '../';
 
@@ -24,11 +23,11 @@ const restore = async (t, dir) => {
   }
 }
 
-const populateSource = auxFile => {
+const populateSource = (src, auxFile) => {
   return new Promise((resolve, reject) => {
     const read = fs.createReadStream(path.resolve('..', 'index.js'));
-    
-    read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
+
+    read.pipe(fs.createWriteStream(path.join(src, 'x.js')));
     read.on('error', reject);
     read.on('end', resolve);
   })
@@ -68,7 +67,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
 test.skip('`.watch` ignores files with ext other than `ext`', async t => {
   t.plan(1);
 
-  await populateSource(path.resolve('..', 'cli.js'))
+  await populateSource(source, path.resolve('..', 'cli.js'))
     .then(async () => {
       const result = await watch(ext, dest, {});
       t.is(result.moved, 1);
@@ -79,7 +78,7 @@ test.skip('`.watch` ignores files with ext other than `ext`', async t => {
 test.skip('`.watch` transfers file from `source` to `dest`', async t => {
   t.plan(2);
 
-  await populateSource(null)
+  await populateSource(source)
     .then(readDest)
     .catch(t.ifError)
 
