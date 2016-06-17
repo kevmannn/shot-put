@@ -54,7 +54,9 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with ext other than `ext`', async t => {})
+test.skip('`.watch` ignores files with ext other than `ext`', async t => {
+  const result = await watch(ext, p, {});
+})
 
 test.skip('`.watch` transfers file from `source` to `dest`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
