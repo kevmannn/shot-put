@@ -67,7 +67,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
 test.skip('`.watch` ignores files with ext other than `ext`', async t => {
   t.plan(1);
 
-  await populateSource(source, path.resolve('..', 'cli.js'))
+  await populateSource(source, path.resolve('..', 'README.md'))
     .then(async () => {
       const result = await watch(ext, dest, {});
       t.is(result.moved, 1);
@@ -75,10 +75,10 @@ test.skip('`.watch` ignores files with ext other than `ext`', async t => {
     .catch(t.ifError)
 })
 
-test.skip('`.watch` transfers file from `source` to `dest`', async t => {
+test.skip('`.watch` transfers file from `source` to `dest`', t => {
   t.plan(2);
 
-  await populateSource(source)
+  populateSource(source)
     .then(readDest)
     .catch(t.ifError)
 
@@ -91,6 +91,7 @@ test.skip('`.watch` transfers file from `source` to `dest`', async t => {
       fs.readdir(dest, (err, contents) => {
         t.ifError(err);
         t.true(contents.indexOf('index.js') !== -1);
+        t.end();
       })
     })
   }
