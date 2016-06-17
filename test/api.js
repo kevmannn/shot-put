@@ -23,7 +23,7 @@ const restore = async (t, dir) => {
   }
 }
 
-const populateSource = aux => {
+const populateSource = auxFile => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
   read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
 
@@ -64,24 +64,21 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with ext other than `ext`', t => {
+test.skip('`.watch` ignores files with ext other than `ext`', async t => {
   t.plan(1);
-  const aux = [];
 
-  populateSource(aux)
-    .then(checkMoved)
+  await populateSource(path.resolve('..', 'cli.js'))
+    .then(async () => {
+      const result = await watch(ext, dest, {});
+      t.is(result.moved, 1);
+    })
     .catch(t.ifError)
-
-  async function checkMoved() {
-    const result = await watch(ext, dest, {});
-    t.is(result.moved, 1);
-  }
 })
 
-test.skip('`.watch` transfers file from `source` to `dest`', t => {
+test.skip('`.watch` transfers file from `source` to `dest`', async t => {
   t.plan(2);
 
-  populateSource(null)
+  await populateSource(null)
     .then(readDest)
     .catch(t.ifError)
 
