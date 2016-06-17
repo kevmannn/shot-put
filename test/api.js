@@ -4,6 +4,7 @@ import { execFile, fork } from 'child_process';
 import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
+// import through from 'through';
 import pify from 'pify';
 import { watch } from '../';
 
@@ -24,10 +25,10 @@ const restore = async (t, dir) => {
 }
 
 const populateSource = auxFile => {
-  const read = fs.createReadStream(path.resolve('..', 'index.js'));
-  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
-
   return new Promise((resolve, reject) => {
+    const read = fs.createReadStream(path.resolve('..', 'index.js'));
+    
+    read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
     read.on('error', reject);
     read.on('end', resolve);
   })
@@ -91,7 +92,6 @@ test.skip('`.watch` transfers file from `source` to `dest`', async t => {
       fs.readdir(dest, (err, contents) => {
         t.ifError(err);
         t.true(contents.indexOf('index.js') !== -1);
-        t.end();
       })
     })
   }
