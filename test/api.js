@@ -23,6 +23,16 @@ const restore = async (t, dir) => {
   }
 }
 
+const populateSource = aux => {
+  const read = fs.createReadStream(path.resolve('..', 'index.js'));
+  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
+
+  return new Promise((resolve, reject) => {
+    read.on('error', reject);
+    read.on('end', resolve);
+  })
+}
+
 test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
 
 test('`.watch` rejects non-existing `dest` path', async t => {
@@ -54,19 +64,28 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with ext other than `ext`', async t => {
-  const result = await watch(ext, p, {});
+test.skip('`.watch` ignores files with ext other than `ext`', t => {
+  t.plan(1);
+  const aux = [];
+
+  populateSource(aux)
+    .then(checkMoved)
+    .catch(t.ifError)
+
+  async function checkMoved() {
+    const result = await watch(ext, dest, {});
+    t.is(result.moved, 1);
+  }
 })
 
 test.skip('`.watch` transfers file from `source` to `dest`', t => {
-  const read = fs.createReadStream(path.resolve('..', 'index.js'));
+  t.plan(2);
 
-  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
+  populateSource(null)
+    .then(readDest)
+    .catch(t.ifError)
 
-  read.on('error', t.ifError);
-  read.on('end', sPut);
-
-  function sPut() {
+  function readDest() {
     const sPut = fork('../cli.js', [ext, dest], { env });
 
     sPut.on('message', m => {
@@ -74,7 +93,6 @@ test.skip('`.watch` transfers file from `source` to `dest`', t => {
 
       fs.readdir(dest, (err, contents) => {
         t.ifError(err);
-
         t.true(contents.indexOf('index.js') !== -1);
         t.end();
       })
