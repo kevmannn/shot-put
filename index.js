@@ -6,9 +6,10 @@ const _ = require('lodash');
 const async = require('async');
 const untildify = require('untildify');
 const pathExists = require('path-exists');
+const osHomedir = require('os-homedir');
 
 const ps = new EventEmitter();
-const home = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
+const home = osHomedir();
 let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
 
 const parseHome = str => {
@@ -19,7 +20,7 @@ exports.ps = ps;
 
 exports.watch = (ext, destPath, opts) => {
   if (!_.every([ext, destPath], x => typeof x === 'string')) {
-    throw new TypeError(`expected strings as first two args`);
+    throw new TypeError('expected strings as first two args');
   }
 
   opts = opts || {};
@@ -33,7 +34,7 @@ exports.watch = (ext, destPath, opts) => {
     process.nextTick(() => process.kill(process.pid, 'SIGINT'));
   }
 
-  if (ext.charAt(0) !== '.') ext = '.' + ext;
+  if (ext.charAt(0) !== '.') ext = `.${ext}`;
 
   if (typeof opts.preserve !== 'undefined') {
     preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
