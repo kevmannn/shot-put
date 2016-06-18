@@ -26,19 +26,16 @@ exports.watch = (ext, destPath, opts) => {
   opts = opts || {};
   destPath = parseHome(untildify(destPath));
 
-  const moved = [];
-  let preserved = [];
+  const session = { moved: [], preserved: [] };
 
   if (ext.charAt(0) !== '.') ext = `.${ext}`;
 
   if (typeof opts.preserve !== 'undefined') {
-    preserved = opts.preserve.split(/\s/g).map(file => file.replace('"', ''));
+    session.preserved = opts.preserve.split(/\s/g).map(f => f.replace('\"', ''));
   }
 
   return new Promise((resolve, reject) => {
     process.on('SIGINT', () => {
-      const session = { moved, preserved };
-
       if (process.env.FORK) process.send(session);
       resolve(session);
     })
@@ -87,7 +84,7 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   function moveFile(filename, cb) {
-    if (preserved.indexOf(filename) !== -1) return null;
+    if (session.preserved.indexOf(filename) !== -1) return null;
 
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
@@ -97,7 +94,7 @@ exports.watch = (ext, destPath, opts) => {
 
     read.on('error', cb);
     read.on('end', () => {
-      moved.push(filename);
+      session.moved.push(filename);
       process.nextTick(fs.unlink.bind(null, oldPath, cb));
     })
   }

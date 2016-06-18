@@ -79,20 +79,19 @@ test.skip('`.watch` transfers file from `source` to `dest`', t => {
   t.plan(2);
 
   populateSource(source)
-    .then(readDest)
+    .then(observeMove)
     .catch(t.ifError)
 
-  function readDest() {
+  function observeMove() {
     const sPut = fork('../cli.js', [ext, dest], { env });
 
-    sPut.on('message', m => {
-      t.is(m.moved.length, 1);
+    ps.on('begin-watch', sourcePath => {
+      t.is(sourcePath, source);
+    })
 
-      fs.readdir(dest, (err, contents) => {
-        t.ifError(err);
-        t.true(contents.indexOf('index.js') !== -1);
-        t.end();
-      })
+    ps.on('move', filename => {
+      t.is(filename, 'x.js');
+      t.end();
     })
   }
 })
