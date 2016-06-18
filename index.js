@@ -44,13 +44,13 @@ exports.watch = (ext, destPath, opts) => {
       .then(beginWatch)
       .catch(reject)
 
-    function beginWatch(validPath) {
+    function beginWatch(isValidPath) {
       if (process.env.FORK) {
         source = path.join(__dirname, 'output', 'x');
         process.nextTick(process.kill.bind(null, process.pid, 'SIGINT'));
       }
 
-      if (!validPath) return reject(`${destPath} is not a valid directory\n`);
+      if (!isValidPath) return reject(`${destPath} is not a valid directory\n`);
       if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
       ps.emit('begin-watch', source);

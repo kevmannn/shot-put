@@ -85,13 +85,13 @@ test.skip('`.watch` transfers file from `source` to `dest`', t => {
   function observeMove() {
     const sPut = fork('../cli.js', [ext, dest], { env });
 
-    ps.on('begin-watch', sourcePath => {
-      t.is(sourcePath, source);
-    })
+    // ps.on('begin-watch', sourcePath => {
+    //   t.is(sourcePath, source);
+    // })
 
-    ps.on('move', filename => {
-      t.is(filename, 'x.js');
-      t.end();
-    })
+    // ps.on('move', filename => {
+    //   t.is(filename, 'x.js');
+    //   t.end();
+    // })
   }
 })
