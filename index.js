@@ -29,11 +29,6 @@ exports.watch = (ext, destPath, opts) => {
   const moved = [];
   let preserved = [];
 
-  if (process.env.FORK) {
-    source = path.join(__dirname, 'output', 'x');
-    process.nextTick(() => process.kill(process.pid, 'SIGINT'));
-  }
-
   if (ext.charAt(0) !== '.') ext = `.${ext}`;
 
   if (typeof opts.preserve !== 'undefined') {
@@ -53,6 +48,11 @@ exports.watch = (ext, destPath, opts) => {
       .catch(reject)
 
     function beginWatch(validPath) {
+      if (process.env.FORK) {
+        source = path.join(__dirname, 'output', 'x');
+        process.nextTick(process.kill.bind(null, process.pid, 'SIGINT'));
+      }
+
       if (!validPath) return reject(`${destPath} is not a valid directory\n`);
       if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
