@@ -45,10 +45,6 @@ sPut.watch(cli.input[0], cli.input[1], cli.flags)
 function logResult(info) {
   const numMovedStr = chalkForm(['cyan', 'bold'])(`${info.moved.length} ${cli.input[0]}`);
 
-  if (process.env.FORK) {
-    process.send({ movedFiles: info.moved, preservedFiles: info.preserved });
-  }
-
   write(`\n> moved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:\n`);
 
   info.moved.forEach(f => write(`  ${chalkForm(['italic', 'dim'])(f)}\n`));

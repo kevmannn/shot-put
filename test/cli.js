@@ -10,7 +10,7 @@ test.cb('--preserve protects files from movement', t => {
   const sPut = fork('../cli.js', [ext, __dirname, '--preserve="i.js j.js"'], { env });
 
   sPut.on('message', m => {
-    t.deepEqual(m.preservedFiles, ['i.js', 'j.js']);
+    t.deepEqual(m.preserved, ['i.js', 'j.js']);
     t.end();
   })
 })

@@ -41,7 +41,12 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   return new Promise((resolve, reject) => {
-    process.on('SIGINT', () => resolve({ moved, preserved }));
+    process.on('SIGINT', () => {
+      const session = { moved, preserved };
+
+      if (process.env.FORK) process.send(session);
+      resolve(session);
+    })
 
     pathExists(destPath)
       .then(beginWatch)
@@ -61,10 +66,10 @@ exports.watch = (ext, destPath, opts) => {
   })
 
   function moveExisting(cb) {
-    fs.readdir(source, (err, files) => {
+    fs.readdir(source, (err, contents) => {
       if (err) return cb(err);
 
-      const ofExt = files.filter(f => path.extname(f) === ext);
+      const ofExt = contents.filter(f => path.extname(f) === ext);
       async.each(ofExt, moveFile, cb);
     })
   }

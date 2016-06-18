@@ -5,7 +5,7 @@ import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import pify from 'pify';
-import { watch } from '../';
+import { watch, ps } from '../';
 
 const ext = '.js';
 const source = path.resolve('..', 'output', 'x');
@@ -49,7 +49,7 @@ test.cb('`.watch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
-    t.truthy(m.movedFiles);
+    t.truthy(m.moved);
     t.end();
   })
 })
@@ -58,8 +58,8 @@ test.cb('`info.moved` reflects number of files moved', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
-    t.true(Array.isArray(m.movedFiles));
-    t.is(m.movedFiles.length, 0);
+    t.true(Array.isArray(m.moved));
+    t.is(m.moved.length, 0);
     t.end();
   })
 })
@@ -86,7 +86,7 @@ test.skip('`.watch` transfers file from `source` to `dest`', t => {
     const sPut = fork('../cli.js', [ext, dest], { env });
 
     sPut.on('message', m => {
-      t.is(m.movedFiles.length, 1);
+      t.is(m.moved.length, 1);
 
       fs.readdir(dest, (err, contents) => {
         t.ifError(err);
