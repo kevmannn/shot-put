@@ -25,7 +25,7 @@ exports.watch = (ext, destPath, opts) => {
   opts = opts || {};
   destPath = parseHome(untildify(destPath));
 
-  let moved = [];
+  const moved = [];
   let preserved = [];
 
   if (process.env.FORK) {

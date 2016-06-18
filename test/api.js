@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { execFile, fork } from 'child_process';
+import { fork } from 'child_process';
 import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
