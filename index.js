@@ -65,7 +65,7 @@ exports.watch = (ext, destPath, opts) => {
       if (err) return cb(err);
 
       const ofExt = files.filter(f => path.extname(f) === ext);
-      async.each(ofExt, moveFile, err => cb(err || null));
+      async.each(ofExt, moveFile, cb);
     })
   }
 
@@ -93,7 +93,7 @@ exports.watch = (ext, destPath, opts) => {
     read.on('error', cb);
     read.on('end', () => {
       moved.push(filename);
-      process.nextTick(() => fs.unlink(oldPath, err => cb(err ? err : null)));
+      process.nextTick(fs.unlink.bind(null, oldPath, cb));
     })
   }
 }
