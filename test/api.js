@@ -5,7 +5,7 @@ import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import pify from 'pify';
-import { watch, ps } from '../';
+import { watch } from '../';
 
 const ext = '.js';
 const source = path.resolve('..', 'output', 'x');
@@ -35,13 +35,15 @@ const populateSource = (src, auxFile) => {
 
 test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
 
+test.skip('`.watch` parses paths to `dest`', t => {})
+
 test('`.watch` rejects non-existing `dest` path', async t => {
-  const p = path.join(dest, 'z');
+  const nonPath = path.join(dest, 'z');
 
   try {
-    const result = await watch(ext, p, {});
+    const result = await watch(ext, nonPath, {});
   } catch (err) {
-    t.is(err, `${p} is not a valid directory\n`);
+    t.is(err, `${nonPath} is not a valid directory\n`);
   }
 })
 
@@ -64,10 +66,11 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with ext other than `ext`', async t => {
+test.skip('`.watch` ignores files with extension other than `ext`', async t => {
   t.plan(1);
+  const pathToReadme = path.resolve('..', 'README.md');
 
-  await populateSource(source, path.resolve('..', 'README.md'))
+  await populateSource(source, pathToReadme)
     .then(async () => {
       const result = await watch(ext, dest, {});
       t.is(result.moved, 1);
@@ -75,23 +78,13 @@ test.skip('`.watch` ignores files with ext other than `ext`', async t => {
     .catch(t.ifError)
 })
 
-test.skip('`.watch` transfers file from `source` to `dest`', t => {
+test.skip('`.watch` transfers `ext` file from `source` to `dest`', async t => {
   t.plan(2);
 
-  populateSource(source)
-    .then(observeMove)
+  await populateSource(source)
+    .then(async () => {
+      const result = await watch(ext, dest, {});
+      t.is(result.moved, 1);
+    })
     .catch(t.ifError)
-
-  function observeMove() {
-    const sPut = fork('../cli.js', [ext, dest], { env });
-
-    // ps.on('begin-watch', sourcePath => {
-    //   t.is(sourcePath, source);
-    // })
-
-    // ps.on('move', filename => {
-    //   t.is(filename, 'x.js');
-    //   t.end();
-    // })
-  }
 })
