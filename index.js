@@ -25,10 +25,9 @@ exports.watch = (ext, destPath, opts) => {
 
   opts = opts || {};
   destPath = parseHome(untildify(destPath));
+  ext = ext.charAt(0) !== '.' ? `.${ext}` : ext;
 
   const session = { moved: [], preserved: [] };
-
-  if (ext.charAt(0) !== '.') ext = `.${ext}`;
 
   if (typeof opts.preserve !== 'undefined') {
     session.preserved = opts.preserve.split(/\s/g).map(f => f.replace('\"', ''));
