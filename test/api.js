@@ -5,6 +5,8 @@ import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import pify from 'pify';
+// import concat from 'concat-stream';
+import combined from 'combined-stream';
 import { watch } from '../';
 
 const ext = '.js';
@@ -23,13 +25,15 @@ const restore = async (t, dir) => {
   }
 }
 
-const populateSource = (src, auxFile) => {
-  return new Promise((resolve, reject) => {
-    const read = fs.createReadStream(path.resolve('..', 'index.js'));
+const populateSource = filenames => {
+  const agg = combined.create();
 
-    read.pipe(fs.createWriteStream(path.join(src, 'x.js')));
-    read.on('error', reject);
-    read.on('end', resolve);
+  return new Promise((resolve, reject) => {
+    filenames.forEach(f => agg.append(path.resolve('..', f)));
+
+    agg.pipe(fs.createWriteStream(path.join(source, 'x.js')));
+    agg.on('error', reject);
+    agg.on('end', resolve);
   })
 }
 
@@ -68,9 +72,8 @@ test.cb('`info.moved` reflects number of files moved', t => {
 
 test.skip('`.watch` ignores files with extension other than `ext`', async t => {
   t.plan(1);
-  const pathToReadme = path.resolve('..', 'README.md');
 
-  await populateSource(source, pathToReadme)
+  await populateSource(['index.js', 'README.md'])
     .then(async () => {
       const result = await watch(ext, dest, {});
       t.is(result.moved, 1);
@@ -81,7 +84,7 @@ test.skip('`.watch` ignores files with extension other than `ext`', async t => {
 test.skip('`.watch` transfers `ext` file from `source` to `dest`', async t => {
   t.plan(2);
 
-  await populateSource(source)
+  await populateSource(['index.js'])
     .then(async () => {
       const result = await watch(ext, dest, {});
       t.is(result.moved, 1);
