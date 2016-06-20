@@ -5,15 +5,14 @@ import test from 'ava';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import pify from 'pify';
-// import concat from 'concat-stream';
 import combined from 'combined-stream';
 import { watch } from '../';
 
 const ext = '.js';
 const source = path.resolve('..', 'output', 'x');
 const dest = path.resolve('..', 'output', 'y');
-const env = Object.create(process.env);
 
+const env = Object.create(process.env);
 env.FORK = true;
 
 const restore = async (t, dir) => {
@@ -70,24 +69,29 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with extension other than `ext`', async t => {
-  t.plan(1);
+// test.skip('`.watch` ignores files with extension other than `ext`', async t => {
+//   await populateSource(['index.js', 'README.md'])
+//     .then(async () => {
+//       const result = await watch(ext, dest, {});
+//       t.is(result.moved, 1);
+//     })
+//     .catch(t.ifError)
+// })
 
-  await populateSource(['index.js', 'README.md'])
-    .then(async () => {
-      const result = await watch(ext, dest, {});
-      t.is(result.moved, 1);
-    })
+test.skip('`.watch` transfers `ext` file from `source` to `dest`', t => {
+  const sPut = fork('../cli.js', [ext, dest], { env });
+
+  populateSource(['index.js'])
+    .then(readDest)
     .catch(t.ifError)
-})
 
-test.skip('`.watch` transfers `ext` file from `source` to `dest`', async t => {
-  t.plan(2);
-
-  await populateSource(['index.js'])
-    .then(async () => {
-      const result = await watch(ext, dest, {});
-      t.is(result.moved, 1);
-    })
-    .catch(t.ifError)
+  async function readDest() {
+    try {
+      const contents = await pify(fs.readdir)(dest);
+      t.true(contents.indexOf('index.js') !== -1);
+      t.end();
+    } catch (err) {
+      t.ifError(err);
+    }
+  }
 })
