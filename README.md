@@ -18,16 +18,14 @@ $ shot-put <ext dir>
 ```
 
 ### Options
-Prevent specific files from ever being moved:
-```console
-shot-put <ext dir> --preserve="<filenames>"
-```
+* `-p`, `--preserve` - prevent specific files from ever being moved
 
 ### Examples
 ```console
 $ shot-put .png /desktop/ideas/space
 $ shot-put .js /documents/scripts
 $ shot-put .py /documents/scripts --preserve="i.py j.py"
+$ shot-put .py /documents/scripts -p="i.py j.py k.py"
 ```
 
 ## License
