@@ -38,7 +38,7 @@ const populateSource = filenames => {
 
 test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
 
-test.skip('`.watch` parses paths to `dest`', t => {})
+test.skip('`.watch` parses paths to `dest`', async t => {})
 
 test('`.watch` rejects non-existing `dest` path', async t => {
   const nonPath = path.join(dest, 'z');
@@ -54,7 +54,7 @@ test.cb('`.watch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
-    t.truthy(m.moved);
+    t.deepEqual(m, { moved: [], preserved: [] });
     t.end();
   })
 })
@@ -63,8 +63,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
   const sPut = fork('../cli.js', [ext, __dirname], { env });
 
   sPut.on('message', m => {
-    t.true(Array.isArray(m.moved));
-    t.is(m.moved.length, 0);
+    t.deepEqual(m.moved, []);
     t.end();
   })
 })
