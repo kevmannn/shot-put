@@ -17,7 +17,7 @@ const dest = path.resolve('..', 'output', 'y');
 const env = Object.create(process.env);
 env.FORK = true;
 
-const restore = async (t, dir) => {
+const restoreDir = async (t, dir) => {
   try {
     await pify(rimraf)(dir);
     mkdirp(dir);
@@ -38,7 +38,7 @@ const populateSource = filenames => {
   })
 }
 
-test.beforeEach(t => [source, dest].forEach(restore.bind(null, t)));
+test.beforeEach(t => [source, dest].forEach(restoreDir.bind(null, t)));
 
 test.skip('`.watch` parses paths to `dest`', async t => {
   const paths = [`~${path.sep}`, home].map(p => path.join(p, dest));
