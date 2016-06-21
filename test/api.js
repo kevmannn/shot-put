@@ -6,17 +6,16 @@ import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import pify from 'pify';
 import osHomedir from 'os-homedir';
-// import combined from 'combined-stream';
+// import concat from 'concat-stream';
 import { watch } from '../';
 
 const ext = '.js';
 const home = osHomedir();
 const source = path.resolve('..', 'output', 'x');
 const dest = path.resolve('..', 'output', 'y');
-
 const env = Object.create(process.env);
+
 env.FORK = true;
-// env.T = 0;
 
 const restoreDir = async (t, dir) => {
   try {
@@ -25,17 +24,6 @@ const restoreDir = async (t, dir) => {
   } catch (err) {
     t.ifError(err);
   }
-}
-
-const populateSource = filenames => {
-  // const agg = combined.create();
-  return new Promise((resolve, reject) => {
-    const read = fs.createReadStream(filenames[0]);
-
-    read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
-    read.on('error', reject);
-    read.on('end', resolve);
-  })
 }
 
 test.beforeEach(t => [source, dest].forEach(restoreDir.bind(null, t)));
@@ -77,31 +65,21 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` ignores files with extension other than `ext`', async t => {
-  const sPut = fork('..cli.js', [ext, dest], { env });
+test.skip('`.watch` ignores files with extension other than `ext`', async t => {})
 
-  await populateSource(['index.js', 'README.md'])
-    .then(readDest)
-    .catch(t.ifError)
+test.skip('`.watch` transfers `ext` file from `source` to `dest`', t => {
+  const read = fs.createReadStream(path.resolve('..', 'index.js'));
 
-  async function readDest() {
-    const y = await pify(fs.readdir)(dest);
-    t.deepEqual(y, ['index.js']);
-  }
-})
-
-test.skip('`.watch` transfers `ext` file from `source` to `dest`', async t => {
-  // env.T = 200;
-  const sPut = fork('../cli.js', [ext, dest], { env });
-
-  await populateSource(['index.js'])
-    .then(readDest)
-    .catch(t.ifError)
+  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
+  read.on('error', t.ifError);
+  read.on('end', readDest);
 
   async function readDest() {
+    await watch(ext, dest, {});
     const x = await pify(fs.readdir)(source);
     const y = await pify(fs.readdir)(dest);
     t.deepEqual(x, []);
     t.deepEqual(y, ['index.js']);
+    t.end();
   }
 })

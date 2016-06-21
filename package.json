@@ -45,6 +45,7 @@
     "async": "^2.0.0-rc.3",
     "chalk-form": "^0.1.2",
     "combined-stream": "^1.0.5",
+    "concat-stream": "^1.5.1",
     "lodash": "^4.13.1",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
