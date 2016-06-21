@@ -28,15 +28,6 @@ const restoreDir = async (t, dir) => {
 
 test.beforeEach(t => [source, dest].forEach(restoreDir.bind(null, t)));
 
-test.skip('`.watch` parses varying paths to `dest`', async t => {
-  const paths = [`~${path.sep}`, home].map(p => path.join(p, dest));
-
-  await paths.forEach(async p => {
-    const result = await watch(ext, p);
-    t.deepEqual(result, { moved: [], preserved: [] });
-  })
-})
-
 test('`.watch` rejects non-existing `dest` path', async t => {
   const nonPath = path.join(dest, 'z');
 
@@ -62,6 +53,15 @@ test.cb('`info.moved` reflects number of files moved', t => {
   sPut.on('message', m => {
     t.is(m.moved.length, 0);
     t.end();
+  })
+})
+
+test.skip('`.watch` parses varying paths to `dest`', async t => {
+  const paths = [`~${path.sep}`, home].map(p => path.join(p, dest));
+
+  await paths.forEach(async p => {
+    const result = await watch(ext, p);
+    t.deepEqual(result, { moved: [], preserved: [] });
   })
 })
 
