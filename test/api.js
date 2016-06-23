@@ -6,7 +6,6 @@ import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import pify from 'pify';
 import osHomedir from 'os-homedir';
-// import concat from 'concat-stream';
 import { watch } from '../';
 
 const ext = '.js';
