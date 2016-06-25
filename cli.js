@@ -46,6 +46,6 @@ function logResult(info) {
 
   write(`moved ${numMovedStr} file${info.moved.length === 1 ? '' : 's'} from ${sourceStr} to ${destStr}:`);
 
-  info.moved.forEach(f => console.log(`  ${chalkForm(['italic', 'dim'])(f)}\n`));
+  info.moved.forEach(f => console.log(`  ${chalkForm(['italic', 'dim'])(f)}`));
   process.exit(0);
 }

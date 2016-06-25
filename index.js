@@ -3,10 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
+const pump = require('pump');
 const async = require('async');
 const untildify = require('untildify');
-const pathExists = require('path-exists');
 const osHomedir = require('os-homedir');
+const pathExists = require('path-exists');
 
 const ps = new EventEmitter();
 const home = osHomedir();
@@ -88,11 +89,11 @@ exports.watch = (ext, destPath, opts) => {
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
     const read = fs.createReadStream(oldPath);
+    const write = fs.createWriteStream(newPath);
 
-    read.pipe(fs.createWriteStream(newPath));
+    pump(read, write, err => {
+      if (err) return cb(err);
 
-    read.on('error', cb);
-    read.on('end', () => {
       session.moved.push(filename);
       process.nextTick(fs.unlink.bind(null, oldPath, cb));
     })
