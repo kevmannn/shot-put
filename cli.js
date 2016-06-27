@@ -28,12 +28,12 @@ const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 const write = str => process.stdout.write(`\n> ${str}\n`);
 const writeErr = err => process.stderr.write(`\n> ${err}\n`);
 
-sPut.ps.on('begin-watch', src => {
+sPut.ps.on('watch-initialized', src => {
   sourceStr = chalkForm(['dim'])(src);
   write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..`);
 })
 
-sPut.ps.on('move', file => {
+sPut.ps.on('file-moved', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
 })
 

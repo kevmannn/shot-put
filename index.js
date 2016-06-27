@@ -5,6 +5,7 @@ const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
 const pump = require('pump');
 const async = require('async');
+const chokidar = require('chokidar');
 const untildify = require('untildify');
 const osHomedir = require('os-homedir');
 const pathExists = require('path-exists');
@@ -41,10 +42,10 @@ exports.watch = (ext, destPath, opts) => {
     })
 
     pathExists(destPath)
-      .then(beginWatch)
+      .then(init)
       .catch(reject)
 
-    function beginWatch(isValidPath) {
+    function init(isValidPath) {
       if (process.env.FORK) {
         source = path.join(__dirname, 'output', 'x');
         process.nextTick(process.kill.bind(null, process.pid, 'SIGINT'));
@@ -53,39 +54,56 @@ exports.watch = (ext, destPath, opts) => {
       if (!isValidPath) return reject(`${destPath} is not a valid directory\n`);
       if (destPath === source) return reject(`must target a directory other than ${source}\n`);
 
-      ps.emit('begin-watch', source);
-
       async.series([
-        moveExisting,
-        watch
-      ], err => err ? reject(err) : null)
+        moveExistingFiles,
+        initWatch
+      ], err => {
+        if (err) return reject(err);
+        ps.emit('watch-initialized', source);
+      })
     }
   })
 
-  function moveExisting(cb) {
+  function moveExistingFiles(cb) {
     fs.readdir(source, (err, contents) => {
       if (err) return cb(err);
 
-      const ofExt = contents.filter(f => path.extname(f) === ext);
-      async.each(ofExt, moveFile, cb);
+      const ofExt = contents.filter(f => {
+        return path.extname(f) === ext && !~session.preserved.indexOf(f);
+      })
+
+      async.each(ofExt, moveFileToDest, cb);
     })
   }
 
-  function watch(cb) {
-    fs.watch(source, (e, filename) => {
-      if (!(e === 'rename' && path.extname(filename) === ext)) return;
+  function initWatch(cb) {
+    const noop = () => {};
 
-      const emitMove = err => err ? cb(err) : ps.emit('move', filename);
+    const watcher = chokidar.watch(source, {
+      ignored: x => path.extname(x) !== ext,
+      persistent: true,
+      atomic: true
+    })
 
-      pathExists(path.join(source, filename))
-        .then(exists => exists ? moveFile(filename, emitMove) : null)
+    // console.log(watcher);
+    watcher
+      .on('rename', initMove)
+      .on('ready', noop)
+      .on('error', cb)
+
+    function initMove(pathTo) {
+      const file = path.basename(pathTo);
+      const done = err => err ? cb(err) : ps.emit('file-moved', file);
+
+      pathExists(p)
+        .then(exists => {
+          if (exists && !~session.preserved.indexOf(file)) moveFileToDest(file, done);
+        })
         .catch(cb)
-    })
+    }
   }
 
-  function moveFile(filename, cb) {
-    if (session.preserved.indexOf(filename) !== -1) return null;
-
+  function moveFileToDest(filename, cb) {
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
     const read = fs.createReadStream(oldPath);
