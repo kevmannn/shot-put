@@ -2,9 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { fork } from 'child_process';
 import test from 'ava';
+import pify from 'pify';
+import pump from 'pump';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
-import pify from 'pify';
 import osHomedir from 'os-homedir';
 import { watch } from '../';
 
@@ -68,17 +69,17 @@ test.skip('`.watch` ignores files with extension other than `ext`', async t => {
 
 test.skip('`.watch` transfers `ext` file from `source` to `dest`', t => {
   const read = fs.createReadStream(path.resolve('..', 'index.js'));
+  const mockedSource = fs.createWriteStream(path.join(source, 'x.js'));
 
-  read.pipe(fs.createWriteStream(path.join(source, 'x.js')));
-  read.on('error', t.ifError);
-  read.on('end', readDest);
+  pump(read, mockedSource, async err => {
+    if (err) return t.ifError(err);
 
-  async function readDest() {
     await watch(ext, dest, {});
     const x = await pify(fs.readdir)(source);
     const y = await pify(fs.readdir)(dest);
+    
     t.deepEqual(x, []);
     t.deepEqual(y, ['index.js']);
     t.end();
-  }
+  })
 })
