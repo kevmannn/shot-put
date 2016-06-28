@@ -109,7 +109,7 @@ exports.watch = (ext, destPath, opts) => {
 
   function moveFileToDest(filename, cb) {
     const oldPath = path.join(source, filename);
-    const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
+    const newPath = path.join(destPath, filename);
 
     const read = fs.createReadStream(oldPath);
     const write = fs.createWriteStream(newPath);
