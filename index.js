@@ -56,11 +56,8 @@ exports.watch = (ext, destPath, opts) => {
 
       async.series([
         moveExistingFiles,
-        initWatch
-      ], err => {
-        if (err) return reject(err);
-        ps.emit('watch-initialized', source);
-      })
+        beginWatch
+      ], err => err ? reject(err) : null)
     }
   })
 
@@ -76,28 +73,29 @@ exports.watch = (ext, destPath, opts) => {
     })
   }
 
-  function initWatch(cb) {
-    const noop = () => {};
-
+  function beginWatch(cb) {
     const watcher = chokidar.watch(source, {
-      ignored: x => path.extname(x) !== ext,
+      ignored: `!(*/${ext})`,
       persistent: true,
       atomic: true
     })
 
-    // console.log(watcher);
     watcher
-      .on('rename', initMove)
-      .on('ready', noop)
+      .on('ready', () => ps.emit('watch-initialized', source))
+      .on('raw', initMove)
       .on('error', cb)
 
-    function initMove(pathTo) {
+    function initMove(e, pathTo, detail) {
+      if (e !== 'moved' && detail.type !== 'file') return false;
+
       const file = path.basename(pathTo);
       const done = err => err ? cb(err) : ps.emit('file-moved', file);
 
-      pathExists(p)
+      pathExists(pathTo)
         .then(exists => {
-          if (exists && !~session.preserved.indexOf(file)) moveFileToDest(file, done);
+          if (exists && !~session.preserved.indexOf(file)) {
+            moveFileToDest(file, done);
+          }
         })
         .catch(cb)
     }
