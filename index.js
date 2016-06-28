@@ -81,7 +81,7 @@ exports.watch = (ext, destPath, opts) => {
 
   function beginWatch(cb) {
     watcher = chokidar.watch(source, {
-      ignored: `!(*/${ext})`,
+      ignored: `(!(*/${ext})|.*)`,
       persistent: true,
       atomic: true
     })
