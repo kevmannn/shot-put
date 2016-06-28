@@ -92,7 +92,7 @@ exports.watch = (ext, destPath, opts) => {
       .on('error', cb)
 
     function initMove(e, pathTo, detail) {
-      if (e !== 'moved' && detail.type !== 'file') return false;
+      if (e !== 'moved') return false;
 
       const file = path.basename(pathTo);
       const done = err => err ? cb(err) : ps.emit('file-moved', file);
@@ -109,7 +109,7 @@ exports.watch = (ext, destPath, opts) => {
 
   function moveFileToDest(filename, cb) {
     const oldPath = path.join(source, filename);
-    const newPath = path.join(destPath, filename);
+    const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
 
     const read = fs.createReadStream(oldPath);
     const write = fs.createWriteStream(newPath);
