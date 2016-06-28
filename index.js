@@ -29,6 +29,7 @@ exports.watch = (ext, destPath, opts) => {
   destPath = parseHome(untildify(destPath));
   ext = ext.charAt(0) !== '.' ? `.${ext}` : ext;
 
+  let watcher;
   const session = { moved: [], preserved: [] };
 
   if (typeof opts.preserve !== 'undefined') {
@@ -57,7 +58,12 @@ exports.watch = (ext, destPath, opts) => {
       async.series([
         moveExistingFiles,
         beginWatch
-      ], err => err ? reject(err) : null)
+      ], err => {
+        if (err) {
+          if (_.isObject(watcher)) watcher.close();
+          return reject(err);
+        }
+      })
     }
   })
 
@@ -74,7 +80,7 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   function beginWatch(cb) {
-    const watcher = chokidar.watch(source, {
+    watcher = chokidar.watch(source, {
       ignored: `!(*/${ext})`,
       persistent: true,
       atomic: true
@@ -104,6 +110,7 @@ exports.watch = (ext, destPath, opts) => {
   function moveFileToDest(filename, cb) {
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
+
     const read = fs.createReadStream(oldPath);
     const write = fs.createWriteStream(newPath);
 
