@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 'use strict';
+const ora = require('ora');
+const log = require('single-line-log').stdout;
 const meow = require('meow');
 const chalkForm = require('chalk-form');
-const log = require('single-line-log').stdout;
 const sPut = require('./');
 
 const cli = meow(`
@@ -25,10 +26,13 @@ const cli = meow(`
 let sourceStr = '';
 const destStr = chalkForm(['cyan', 'bold'])(cli.input[1]);
 
+const spinner = ora('Initializing watch...').start();
+
 const write = str => process.stdout.write(`\n> ${str}\n`);
 const writeErr = err => process.stderr.write(`\n> ${err}\n`);
 
 sPut.ps.on('watch-initialized', src => {
+  spinner.stop();
   sourceStr = chalkForm(['dim'])(src);
   write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..`);
 })
