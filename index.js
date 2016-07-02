@@ -39,6 +39,8 @@ exports.watch = (ext, destPath, opts) => {
   return new Promise((resolve, reject) => {
     process.on('SIGINT', () => {
       if (process.env.FORK) process.send(session);
+      if (_.isObject(watcher)) watcher.close();
+
       resolve(session);
     })
 
@@ -85,8 +87,6 @@ exports.watch = (ext, destPath, opts) => {
       persistent: true,
       atomic: true
     })
-
-    watcher
       .on('ready', () => ps.emit('watch-initialized', source))
       .on('raw', initMove)
       .on('error', cb)
