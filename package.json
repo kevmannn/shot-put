@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "ava --verbose",
-    "watch": "npm t -- -w"
+    "test:watch": "npm t -- -w"
   },
   "bin": "cli.js",
   "engines": {
