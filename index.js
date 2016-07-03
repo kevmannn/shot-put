@@ -111,10 +111,10 @@ exports.watch = (ext, destPath, opts) => {
     const oldPath = path.join(source, filename);
     const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
 
-    const read = fs.createReadStream(oldPath);
-    const write = fs.createWriteStream(newPath);
+    const rs = fs.createReadStream(oldPath);
+    const ws = fs.createWriteStream(newPath);
 
-    pump(read, write, err => {
+    pump(rs, ws, err => {
       if (err) return cb(err);
 
       session.moved.push(filename);
