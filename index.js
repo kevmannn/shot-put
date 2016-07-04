@@ -91,7 +91,7 @@ exports.watch = (ext, destPath, opts) => {
       persistent: true,
       atomic: true
     })
-      .on('ready', () => ps.emit('watch-initialized', source))
+      .on('ready', () => emitter.emit('watch-initialized', source))
       .on('raw', initMove)
       .on('error', cb)
 
@@ -99,7 +99,7 @@ exports.watch = (ext, destPath, opts) => {
       if (e !== 'moved') return false;
 
       const file = path.basename(pathTo);
-      const done = err => err ? cb(err) : ps.emit('file-moved', file);
+      const done = err => err ? cb(err) : emitter.emit('file-moved', file);
 
       pathExists(pathTo)
         .then(exists => {
