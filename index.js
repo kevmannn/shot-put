@@ -1,8 +1,8 @@
 'use strict';
-const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events').EventEmitter;
 const _ = require('lodash');
+const fs = require('graceful-fs');
 const pump = require('pump');
 const async = require('async');
 const chokidar = require('chokidar');
@@ -10,7 +10,7 @@ const untildify = require('untildify');
 const osHomedir = require('os-homedir');
 const pathExists = require('path-exists');
 
-const ps = new EventEmitter();
+const emitter = new EventEmitter();
 const home = osHomedir();
 let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
 
@@ -18,7 +18,11 @@ const parseHome = str => {
   return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
 }
 
-exports.ps = ps;
+const watcherIsActive = w => {
+  return _.isFunction(w.getWatched) && w.getWatched().length;
+}
+
+exports.emitter = emitter;
 
 exports.watch = (ext, destPath, opts) => {
   if (!_.every([ext, destPath], x => typeof x === 'string')) {
@@ -29,7 +33,7 @@ exports.watch = (ext, destPath, opts) => {
   destPath = parseHome(untildify(destPath));
   ext = ext.charAt(0) !== '.' ? `.${ext}` : ext;
 
-  let watcher;
+  let watcher = {};
   const session = { moved: [], preserved: [] };
 
   if (typeof opts.preserve !== 'undefined') {
@@ -39,7 +43,7 @@ exports.watch = (ext, destPath, opts) => {
   return new Promise((resolve, reject) => {
     process.on('SIGINT', () => {
       if (process.env.FORK) process.send(session);
-      if (_.isObject(watcher)) watcher.close();
+      if (watcherIsActive(watcher)) watcher.close();
 
       resolve(session);
     })
@@ -62,7 +66,7 @@ exports.watch = (ext, destPath, opts) => {
         beginWatch
       ], err => {
         if (err) {
-          if (_.isObject(watcher)) watcher.close();
+          if (watcherIsActive(watcher)) watcher.close();
           return reject(err);
         }
       })

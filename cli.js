@@ -31,13 +31,13 @@ const spinner = ora('Initializing watch...').start();
 const write = str => process.stdout.write(`\n> ${str}\n`);
 const writeErr = err => process.stderr.write(`\n> ${err}\n`);
 
-sPut.ps.on('watch-initialized', src => {
+sPut.emitter.on('watch-initialized', src => {
   spinner.stop();
   sourceStr = chalkForm(['dim'])(src);
   write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..`);
 })
 
-sPut.ps.on('file-moved', file => {
+sPut.emitter.on('file-moved', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
 })
 
