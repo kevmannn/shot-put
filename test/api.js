@@ -1,6 +1,6 @@
-import fs from 'fs';
 import path from 'path';
 import { fork } from 'child_process';
+import fs from 'graceful-fs';
 import test from 'ava';
 import pify from 'pify';
 import pump from 'pump';

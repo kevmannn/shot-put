@@ -18,8 +18,8 @@ const parseHome = str => {
   return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
 }
 
-const watcherIsActive = w => {
-  return _.isFunction(w.getWatched) && w.getWatched().length;
+const watcherIsActive = watcher => {
+  return !!_.keys(watcher.getWatched()).length;
 }
 
 exports.emitter = emitter;
