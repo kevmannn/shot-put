@@ -1,6 +1,6 @@
 {
   "name": "shot-put",
-  "version": "0.10.9",
+  "version": "0.10.10",
   "description": "CLI tool to watch desktop for files of a given extension and automatically move them to a given directory",
   "main": "index.js",
   "scripts": {
