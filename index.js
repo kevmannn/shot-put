@@ -19,7 +19,7 @@ const parseHome = str => {
 }
 
 const watcherIsActive = watcher => {
-  return !!_.keys(watcher.getWatched()).length;
+  return _.isFunction(watcher.getWatched) && _.keys(watcher.getWatched()).length;
 }
 
 exports.emitter = emitter;
