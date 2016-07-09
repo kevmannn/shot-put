@@ -25,8 +25,11 @@ const watcherIsActive = watcher => {
 exports.emitter = emitter;
 
 exports.watch = (ext, destPath, opts) => {
-  if (!_.every([ext, destPath], x => typeof x === 'string')) {
-    throw new TypeError('expected strings as first two args');
+  if (!_.every([ext, destPath], x => _.isString(x))) {
+    throw new TypeError(`
+      expected strings as first two args -
+      got ${[ext, destPath].map(x => typeof x)}
+    `);
   }
 
   opts = opts || {};
@@ -91,7 +94,7 @@ exports.watch = (ext, destPath, opts) => {
       persistent: true,
       atomic: true
     })
-      .on('ready', () => emitter.emit('watch-initialized', source))
+      .on('ready', emitter.emit.bind(emitter, 'watch-initialized', source))
       .on('raw', initMove)
       .on('error', cb)
 

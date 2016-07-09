@@ -40,6 +40,14 @@ test('`.watch` rejects non-existing `dest` path', async t => {
   }
 })
 
+test('`.watch` rejects non-string `ext` and `dest`', async t => {
+  try {
+    const result = await watch(2, null, {});
+  } catch (err) {
+    t.truthy(err);
+  }
+})
+
 test.cb('`.watch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [params.ext, params.dest], { env });
 
