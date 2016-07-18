@@ -7,6 +7,7 @@ import pump from 'pump';
 import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import osHomedir from 'os-homedir';
+import multistream from 'multistream';
 import { watch } from '../';
 
 const home = osHomedir();

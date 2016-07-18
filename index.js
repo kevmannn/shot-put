@@ -9,18 +9,12 @@ const chokidar = require('chokidar');
 const untildify = require('untildify');
 const osHomedir = require('os-homedir');
 const pathExists = require('path-exists');
+const parseHome = require('./util').parseHome;
+const watcherIsActive = require('./util').watcherIsActive;
 
 const emitter = new EventEmitter();
 const home = osHomedir();
 let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
-
-const parseHome = str => {
-  return str.split(path.sep).slice(0, 3).join(path.sep) === home ? str : path.join(home, str);
-}
-
-const watcherIsActive = watcher => {
-  return _.isFunction(watcher.getWatched) && _.keys(watcher.getWatched()).length;
-}
 
 exports.emitter = emitter;
 
@@ -91,10 +85,11 @@ exports.watch = (ext, destPath, opts) => {
   function beginWatch(cb) {
     watcher = chokidar.watch(source, {
       ignored: `(!(*/${ext})|.*)`,
+      depth: 1,
       persistent: true,
       atomic: true
     })
-      .on('ready', emitter.emit.bind(emitter, 'watch-initialized', source))
+      .on('ready', () => emitter.emit('watch-initialized', source))
       .on('raw', initMove)
       .on('error', cb)
 

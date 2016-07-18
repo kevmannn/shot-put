@@ -46,6 +46,7 @@
     "lodash": "^4.13.1",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
+    "multistream": "^2.0.5",
     "ora": "^0.2.3",
     "os-homedir": "^1.0.1",
     "path-exists": "^2.1.0",
