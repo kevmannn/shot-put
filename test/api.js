@@ -1,5 +1,5 @@
-import path from 'path';
 import { fork } from 'child_process';
+import { resolve, join } from 'path';
 import fs from 'graceful-fs';
 import test from 'ava';
 import pify from 'pify';
@@ -16,8 +16,8 @@ env.FORK = true;
 
 const params = {
   ext: '.js',
-  source: path.resolve('..', 'output', 'x'),
-  dest: path.resolve('..', 'output', 'y')
+  source: resolve('..', 'output', 'x'),
+  dest: resolve('..', 'output', 'y')
 }
 
 const restoreDir = async (t, dir) => {
@@ -32,7 +32,7 @@ const restoreDir = async (t, dir) => {
 test.beforeEach(t => [params.source, params.dest].forEach(restoreDir.bind(null, t)));
 
 test('`.watch` rejects non-existing `dest` path', async t => {
-  const nonPath = path.join(params.dest, 'z');
+  const nonPath = join(params.dest, 'z');
 
   try {
     const result = await watch(params.ext, nonPath, {});
@@ -68,7 +68,7 @@ test.cb('`info.moved` reflects number of files moved', t => {
 })
 
 test.skip('`.watch` parses varying paths to `dest`', async t => {
-  const paths = [`~${path.sep}`, home].map(p => path.join(p, params.dest));
+  const paths = [`~${path.sep}`, home].map(p => join(p, params.dest));
 
   await paths.forEach(async p => {
     const result = await watch(params.ext, p);
@@ -79,10 +79,10 @@ test.skip('`.watch` parses varying paths to `dest`', async t => {
 test.skip('`.watch` ignores files with extension other than `ext`', async t => {})
 
 test.skip('`.watch` transfers `ext` file from `source` to `dest`', t => {
-  const read = fs.createReadStream(path.resolve('..', 'index.js'));
-  const mockedSource = fs.createWriteStream(path.join(params.source, 'x.js'));
+  const indexRs = fs.createReadStream(resolve('..', 'index.js'));
+  const sourceWs = fs.createWriteStream(join(params.source, 'x.js'));
 
-  pump(read, mockedSource, async err => {
+  pump(indexRs, sourceWs, async err => {
     if (err) return t.ifError(err);
 
     await watch(params.ext, params.dest, {});
