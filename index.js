@@ -1,20 +1,19 @@
 'use strict';
-const path = require('path');
-const EventEmitter = require('events').EventEmitter;
+const { EventEmitter } = require('events');
+const { sep, join, relative, resolve, basename } = require('path');
 const _ = require('lodash');
 const fs = require('graceful-fs');
 const pump = require('pump');
 const async = require('async');
-const chokidar = require('chokidar');
+const { watch } = require('chokidar');
 const untildify = require('untildify');
 const osHomedir = require('os-homedir');
 const pathExists = require('path-exists');
-const parseHome = require('./util').parseHome;
-const watcherIsActive = require('./util').watcherIsActive;
+const { parseHome, watcherIsActive } = require('./util');
 
-const emitter = new EventEmitter();
 const home = osHomedir();
-let source = path.join(home, path.resolve(home, path.relative(home, `${path.sep}desktop`)));
+const emitter = new EventEmitter();
+let source = join(home, resolve(home, relative(home, `${sep}desktop`)));
 
 exports.emitter = emitter;
 
@@ -51,7 +50,7 @@ exports.watch = (ext, destPath, opts) => {
 
     function init(isValidPath) {
       if (process.env.FORK) {
-        source = path.join(__dirname, 'output', 'x');
+        source = join(__dirname, 'output', 'x');
         process.nextTick(process.kill.bind(null, process.pid, 'SIGINT'));
       }
 
@@ -75,7 +74,7 @@ exports.watch = (ext, destPath, opts) => {
       if (err) return cb(err);
 
       const ofExt = contents.filter(f => {
-        return path.extname(f) === ext && !~session.preserved.indexOf(f);
+        return extname(f) === ext && !~session.preserved.indexOf(f);
       })
 
       async.each(ofExt, moveFileToDest, cb);
@@ -83,7 +82,7 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   function beginWatch(cb) {
-    watcher = chokidar.watch(source, {
+    watcher = watch(source, {
       ignored: `(!(*/${ext})|.*)`,
       depth: 1,
       persistent: true,
@@ -96,7 +95,7 @@ exports.watch = (ext, destPath, opts) => {
     function initMove(e, pathTo, detail) {
       if (e !== 'moved') return false;
 
-      const file = path.basename(pathTo);
+      const file = basename(pathTo);
       const done = err => err ? cb(err) : emitter.emit('file-moved', file);
 
       pathExists(pathTo)
@@ -110,8 +109,8 @@ exports.watch = (ext, destPath, opts) => {
   }
 
   function moveFileToDest(filename, cb) {
-    const oldPath = path.join(source, filename);
-    const newPath = path.join(destPath, filename.replace(/\s/g, '_'));
+    const oldPath = join(source, filename);
+    const newPath = join(destPath, filename.replace(/\s/g, '_'));
 
     const rs = fs.createReadStream(oldPath);
     const ws = fs.createWriteStream(newPath);
