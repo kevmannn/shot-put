@@ -30,4 +30,4 @@ $ shot-put .py /documents/scripts -p="i.py j.py k.py"
 
 ## License
 
-MIT © [Kevin Donahue](https://twitter.com/recur_excur)
+MIT © [Kevin Donahue](https://twitter.com/nonnontrivial)

@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) Kevin Donahue <kevindonahuedevelopment@gmail.com> (https://twitter.com/recur_excur)
+Copyright (c) Kevin Donahue <kevindonahuedevelopment@gmail.com> (https://twitter.com/nonnontrivial)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
