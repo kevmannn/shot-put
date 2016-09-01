@@ -4,7 +4,7 @@ const ora = require('ora');
 const log = require('single-line-log').stdout;
 const meow = require('meow');
 const chalkForm = require('chalk-form');
-const sPut = require('./');
+const shotPut = require('./');
 
 const cli = meow(`
   Usage:
@@ -31,17 +31,17 @@ const spinner = ora('Initializing watch...').start();
 const write = str => process.stdout.write(`\n> ${str}\n`);
 const writeErr = err => process.stderr.write(`\n> ${err}\n`);
 
-sPut.emitter.on('watch-initialized', src => {
+shotPut.emitter.on('watch-initialized', src => {
   spinner.stop();
   sourceStr = chalkForm(['dim'])(src);
   write(`watching ${sourceStr} for new ${chalkForm(['bold', 'cyan'])(cli.input[0])} files..`);
 })
 
-sPut.emitter.on('file-moved', file => {
+shotPut.emitter.on('file-moved', file => {
   log(`  + ${chalkForm(['italic', 'dim'])(file)}\n`);
 })
 
-sPut.watch(cli.input[0], cli.input[1], cli.flags)
+shotPut.beginWatch(cli.input[0], cli.input[1], cli.flags)
   .then(logResult)
   .catch(writeErr)
 

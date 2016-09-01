@@ -1,13 +1,16 @@
-'use strict';
-const path = require('path');
-const _ = require('lodash');
-const home = require('os-homedir')();
+import { sep, join, resolve, relative } from 'path';
+import _ from 'lodash';
+import osHomedir from 'os-homedir';
 
-exports.parseHome = pathTo => {
-  const startPath = pathTo.split(path.sep).slice(0, 3).join(path.sep);
-  return startPath === home ? pathTo : path.join(home, pathTo);
+const home = osHomedir();
+
+export const parseHome = pathTo => {
+  const startPath = pathTo.split(sep).slice(0, 3).join(sep);
+  return startPath === home ? pathTo : join(home, pathTo);
 }
 
-exports.watcherIsActive = watcher => {
+export const watcherIsActive = watcher => {
   return _.isFunction(watcher.getWatched) && _.keys(watcher.getWatched()).length;
 }
+
+export const defaultSorcePath = join(home, resolve(home, relative(home, `${sep}desktop`)));

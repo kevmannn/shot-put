@@ -11,6 +11,11 @@
   "engines": {
     "node": ">=4.0.0"
   },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "keywords": [
     "auto",
     "automate",
@@ -40,6 +45,8 @@
   },
   "dependencies": {
     "async": "^2.0.0-rc.3",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-register": "^6.14.0",
     "chalk-form": "^0.1.2",
     "chokidar": "^1.6.0",
     "graceful-fs": "^4.1.4",

@@ -8,7 +8,7 @@ import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import osHomedir from 'os-homedir';
 import multistream from 'multistream';
-import { watch } from '../';
+import { beginWatch } from '../';
 
 const home = osHomedir();
 const env = Object.create(process.env);
@@ -31,25 +31,25 @@ const restoreDir = async (t, dir) => {
 
 test.beforeEach(t => [params.source, params.dest].forEach(restoreDir.bind(null, t)));
 
-test('`.watch` rejects non-existing `dest` path', async t => {
+test('`.beginWatch` rejects non-existing `dest` path', async t => {
   const nonPath = join(params.dest, 'z');
 
   try {
-    const result = await watch(params.ext, nonPath, {});
+    const result = await beginWatch(params.ext, nonPath, {});
   } catch (err) {
     t.is(err, `${nonPath} is not a valid directory\n`);
   }
 })
 
-test('`.watch` rejects non-string `ext` and `dest`', async t => {
+test('`.beginWatch` rejects non-string `ext` and `dest`', async t => {
   try {
-    const result = await watch(2, null, {});
+    const result = await beginWatch(2, null, {});
   } catch (err) {
     t.truthy(err);
   }
 })
 
-test.cb('`.watch` listens when given valid `dest` path', t => {
+test.cb('`.beginWatch` listens when given valid `dest` path', t => {
   const sPut = fork('../cli.js', [params.ext, params.dest], { env });
 
   sPut.on('message', m => {
@@ -67,25 +67,25 @@ test.cb('`info.moved` reflects number of files moved', t => {
   })
 })
 
-test.skip('`.watch` parses varying paths to `dest`', async t => {
+test.skip('`.beginWatch` parses varying paths to `dest`', async t => {
   const paths = [`~${path.sep}`, home].map(p => join(p, params.dest));
 
   await paths.forEach(async p => {
-    const result = await watch(params.ext, p);
+    const result = await beginWatch(params.ext, p);
     t.deepEqual(result, { moved: [], preserved: [] });
   })
 })
 
-test.skip('`.watch` ignores files with extension other than `ext`', async t => {})
+test.skip('`.beginWatch` ignores files with extension other than `ext`', async t => {})
 
-test.skip('`.watch` transfers `ext` file from `source` to `dest`', t => {
+test.skip('`.beginWatch` transfers `ext` file from `source` to `dest`', t => {
   const indexRs = fs.createReadStream(resolve('..', 'index.js'));
   const sourceWs = fs.createWriteStream(join(params.source, 'x.js'));
 
   pump(indexRs, sourceWs, async err => {
     if (err) return t.ifError(err);
 
-    await watch(params.ext, params.dest, {});
+    await beginWatch(params.ext, params.dest, {});
     const x = await pify(fs.readdir)(params.source);
     const y = await pify(fs.readdir)(params.dest);
     
