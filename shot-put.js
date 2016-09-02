@@ -21,15 +21,13 @@ export const beginWatch = (ext, destPath, opts = {}) => {
     `);
   }
 
+  let watcher = {};
   let source = defaultSourcePath;
   const home = osHomedir();
+  const session = { moved: [], preserved: [] };
 
   ext = ext.charAt(0) !== '.' ? `.${ext}` : ext;
   destPath = parseHome(untildify(destPath));
-  opts = opts;
-
-  let watcher = {};
-  const session = { moved: [], preserved: [] };
 
   if (typeof opts.preserve !== 'undefined') {
     session.preserved = opts.preserve.split(/\s/g).map(f => f.replace('\"', ''));
