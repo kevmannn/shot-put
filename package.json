@@ -41,26 +41,26 @@
     "url": "https://github.com/kevmannn/shot-put"
   },
   "devDependencies": {
-    "ava": "^0.16.0"
+    "ava": "^0.19.1"
   },
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "babel-preset-es2015": "^6.14.0",
     "babel-register": "^6.14.0",
-    "chalk-form": "^0.1.2",
+    "chalk-form": "^1.0.0",
     "chokidar": "^1.6.0",
     "graceful-fs": "^4.1.4",
     "lodash": "^4.14.0",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
     "multistream": "^2.0.5",
-    "ora": "^0.2.3",
+    "ora": "^1.2.0",
     "os-homedir": "^1.0.1",
-    "path-exists": "^2.1.0",
+    "path-exists": "^3.0.0",
     "pify": "^2.3.0",
     "pump": "^1.0.1",
     "rimraf": "^2.5.2",
     "single-line-log": "^1.1.1",
-    "untildify": "^2.1.0"
+    "untildify": "^3.0.2"
   }
 }
