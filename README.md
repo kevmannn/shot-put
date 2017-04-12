@@ -1,5 +1,7 @@
 # shot-put
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kevmannn/shot-put.svg)](https://greenkeeper.io/)
+
 > CLI tool to watch desktop for files of a given extension and automatically move them to a given directory
 
 [![Build Status](https://travis-ci.org/kevmannn/shot-put.svg?branch=master)](https://travis-ci.org/kevmannn/shot-put)
